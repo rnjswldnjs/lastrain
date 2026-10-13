@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="description" content="심야 환승 귀갓길의 최종 출발 마감시각을 판정하는 프로토타입. 혁신기업경영 캡스톤디자인 II Team 04.">
+<meta name="theme-color" content="#f7f7f5">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+
+<style>
+  :root{ padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px) }
+  html,body{ margin:0 }
+  img{ max-width:100% }
+  [hidden]{ display:none !important }
+</style>
+<title>라스트레인</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+/* 레이아웃: 폰 폭 한 칸. 색·라운드·버튼은 LibMatch 테마를 그대로 가져옴 (민트 + 웜 오프화이트). */
+:root{
+  --black:#0a0a0a;
+  --white:#f7f7f5;
+  --mint:#3ECFB2;
+  --mint-dark:#2BA891;
+  --mint-light:#E8FAF6;
+  --gray:#6b7280;
+  --gray-light:#f3f4f6;
+  --gray-border:#e5e7eb;
+  --dark-gray:#374151;
+  --amber:#F59E0B;
+  --amber-light:#FEF3C7;
+  --red:#DC2626;
+  --red-light:#FEE2E2;
+  --sans:'Pretendard',-apple-system,BlinkMacSystemFont,system-ui,'Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{
+  background:var(--white); color:var(--black);
+  font-family:var(--sans); font-size:15px; line-height:1.55;
+  margin:0; -webkit-font-smoothing:antialiased;
+}
+.shell{max-width:480px; margin:0 auto; padding-inline:16px; padding-block:0 40px}
+
+/* ── 헤더 ── */
+.top{
+  position:sticky; top:env(safe-area-inset-top,0px); z-index:20;
+  background:var(--white); border-bottom:1px solid var(--gray-border);
+  margin-inline:-16px; padding:14px 16px 12px;
+  display:flex; align-items:center; gap:9px;
+}
+.brand{font-size:19px; font-weight:800; letter-spacing:-.5px}
+.brand .accent{color:var(--mint)}
+.pill{
+  font-size:11.5px; font-weight:700; border-radius:20px; padding:3px 11px;
+  background:var(--mint-light); color:var(--mint-dark); border:1px solid rgba(62,207,178,.4);
+}
+.top .spacer{margin-left:auto}
+.top .who{font-size:12px; color:var(--gray); font-weight:500}
+
+/* ── 공통 ── */
+.card{background:#fff; border:1px solid var(--gray-border); border-radius:12px; padding:18px}
+h2.sec{font-size:13px; font-weight:700; color:var(--dark-gray); margin:26px 0 10px; letter-spacing:-.2px}
+.grow{flex:1; min-width:0}
+.row{display:flex; gap:10px; align-items:center}
+.wrap{flex-wrap:wrap}
+.faint{font-size:12.5px; color:var(--gray)}
+
+label.fld{display:block; font-size:12.5px; color:var(--gray); font-weight:700; margin-bottom:6px}
+select,input[type=time]{
+  width:100%; min-width:0; background:#fff; color:var(--black);
+  font-family:inherit; font-size:15px; font-weight:500;
+  border:1px solid var(--gray-border); border-radius:10px; padding:11px 12px;
+}
+select:focus,input:focus{border-color:var(--mint); outline:none}
+:focus-visible{outline:2px solid var(--mint-dark); outline-offset:2px}
+input[type=range]{width:100%; accent-color:var(--mint); margin:4px 0 0}
+
+button{font-family:inherit; cursor:pointer}
+.btn{
+  background:#fff; color:var(--dark-gray); border:1px solid var(--gray-border);
+  border-radius:10px; padding:11px 14px; font-size:13.5px; font-weight:700; white-space:nowrap;
+  transition:background .15s,border-color .15s;
+}
+.btn:hover{background:var(--gray-light)}
+.btn.on{background:var(--mint); border-color:var(--mint); color:var(--black)}
+
+/* ── 입력부: LibMatch hero 그라데이션 ── */
+.inputs{
+  background:linear-gradient(135deg,#f7f7f5 0%,#e8faf6 60%,#c8f0e8 100%);
+  border:1px solid rgba(62,207,178,.35); border-radius:12px; padding:18px; margin-top:16px;
+}
+.tempo{margin-top:16px}
+.tempo .marks{display:flex; justify-content:space-between; font-size:11.5px; color:var(--gray); margin-top:4px}
+.tempo .val{color:var(--mint-dark); font-weight:700}
+
+/* ── 판정 ── */
+.verdict{
+  margin-top:12px; border-radius:12px; padding:22px 18px 18px; text-align:center;
+  border:1px solid var(--gray-border); background:#fff;
+}
+.verdict.go{background:var(--mint-light); border-color:rgba(62,207,178,.55)}
+.verdict.stop{background:var(--red-light); border-color:rgba(220,38,38,.35)}
+.verdict .call{font-size:17px; font-weight:800; letter-spacing:-.3px}
+.verdict.go .call{color:var(--mint-dark)}
+.verdict.stop .call{color:var(--red)}
+.dl-label{font-size:12px; font-weight:700; color:var(--gray); margin-top:16px}
+.deadline{
+  font-size:clamp(50px,16vw,66px); font-weight:800; line-height:1.02; letter-spacing:-2px;
+  font-variant-numeric:tabular-nums; margin-top:2px;
+}
+.left{font-size:13.5px; color:var(--dark-gray); margin-top:7px; font-weight:500}
+.left b{font-weight:800; font-variant-numeric:tabular-nums}
+.bar{height:5px; border-radius:20px; background:rgba(255,255,255,.75); overflow:hidden; margin-top:16px}
+.bar i{display:block; height:100%; border-radius:20px; background:var(--mint-dark); transition:width .35s ease}
+.verdict.stop .bar i{background:var(--red)}
+@media (prefers-reduced-motion:reduce){ .bar i{transition:none} }
+
+/* ── 구간 ── */
+.leg{display:flex; gap:11px; align-items:flex-start; padding:11px 0; border-bottom:1px solid var(--gray-border)}
+.leg:last-of-type{border-bottom:0}
+.chip{
+  flex:0 0 auto; min-width:46px; height:23px; padding:0 7px; border-radius:20px;
+  font-size:11px; font-weight:700; color:#fff; display:flex; align-items:center; justify-content:center;
+}
+.chip.walk{background:var(--gray-light); color:var(--gray); border:1px solid var(--gray-border)}
+.leg .nm{font-size:13.5px; font-weight:700; letter-spacing:-.2px}
+.leg .sub{font-size:12px; color:var(--gray)}
+.leg .rt{flex:0 0 auto; text-align:right}
+.leg .rt .k{font-size:10.5px; color:var(--gray); font-weight:700}
+.leg .rt .v{font-size:14px; font-weight:700; font-variant-numeric:tabular-nums}
+.leg.cut{background:var(--red-light); margin-inline:-10px; padding-inline:10px; border-radius:10px; border-bottom-color:transparent}
+.leg.cut .rt .v{color:var(--red)}
+
+.cutbox{background:var(--red-light); border:1px solid rgba(220,38,38,.3); border-radius:10px; padding:14px; margin-top:12px}
+.cutbox .h{font-size:12.5px; font-weight:800; color:var(--red); margin-bottom:6px}
+.cutbox .body{font-size:13px; color:var(--dark-gray)}
+.cutbox .why{font-size:12px; color:var(--gray); margin-top:4px}
+.okbox{font-size:13px; color:var(--gray); padding:12px 0 2px}
+
+details{border-top:1px solid var(--gray-border); margin-top:14px; padding-top:12px}
+summary{cursor:pointer; font-size:13px; font-weight:700; color:var(--mint-dark); list-style:none}
+summary::-webkit-details-marker{display:none}
+summary::after{content:" ▾"}
+details[open] summary::after{content:" ▴"}
+
+table{width:100%; border-collapse:collapse; font-size:12.5px; margin-top:10px}
+th,td{text-align:left; padding:8px 6px; border-bottom:1px solid var(--gray-border)}
+th{font-size:11px; color:var(--gray); font-weight:700}
+td.n{font-variant-numeric:tabular-nums; white-space:nowrap; font-weight:500}
+
+.alt{display:flex; gap:10px; align-items:center; padding:11px 0; border-bottom:1px solid var(--gray-border)}
+.alt:last-child{border-bottom:0}
+.alt .nm{font-size:13.5px; font-weight:700}
+.tag{font-size:11px; font-weight:700; color:#B45309; background:var(--amber-light); padding:3px 10px; border-radius:12px; white-space:nowrap}
+
+.note{
+  margin-top:22px; background:var(--amber-light); border:1px solid rgba(245,158,11,.35);
+  border-radius:10px; padding:13px 14px; font-size:12.5px; color:#78350F; line-height:1.6;
+}
+.note b{font-weight:800}
+.foot{margin-top:18px; font-size:11.5px; color:var(--gray); text-align:center}
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="top">
+    <span class="brand">라스트<span class="accent">레인</span></span>
+    <span class="pill">v0.1</span>
+    <span class="spacer"></span>
+    <span class="who">Team 04</span>
+  </header>
+
+  <div class="inputs">
+    <div class="row wrap" style="gap:12px">
+      <div class="grow" style="flex-basis:100%">
+        <label class="fld" for="route">귀가 경로</label>
+        <select id="route"></select>
+      </div>
+      <div class="grow">
+        <label class="fld" for="now">현재 시각</label>
+        <input type="time" id="now" value="23:38">
+      </div>
+      <div style="flex:0 0 auto; align-self:flex-end">
+        <button class="btn" id="play">▶ 재생</button>
+      </div>
+    </div>
+
+    <div class="tempo">
+      <label class="fld" for="tempo">내 걸음 속도 — <span class="val" id="tempoNow">보통</span></label>
+      <input type="range" id="tempo" min="0" max="4" step="1" value="2">
+      <div class="marks"><span>많이 느림</span><span>보통</span><span>빠름</span></div>
+    </div>
+  </div>
+
+  <div id="verdict" class="verdict"></div>
+
+  <h2 class="sec">구간별 연결</h2>
+  <div class="card" style="padding:4px 18px 16px">
+    <div id="legs"></div>
+    <details>
+      <summary>왜 이 시각인가요</summary>
+      <p class="faint" style="margin:10px 0 0">
+        도착지에서 거꾸로 올라오며 각 구간을 “늦어도 몇 시에 시작해야 하는가”로 바꿉니다.
+        맨 앞까지 오면 그게 최종 출발 마감시각입니다.
+      </p>
+      <table id="calc"></table>
+    </details>
+  </div>
+
+  <h2 class="sec">놓쳤을 때</h2>
+  <div class="card" style="padding:4px 18px 14px"><div id="alts"></div></div>
+
+  <div class="note">
+    <b>이 화면의 숫자에 대해.</b> 경로와 구간 소요시간은 ODsay 대중교통 API 실제 응답에서 가져왔고,
+    <b>막차 시각은 아직 실측 전 샘플값</b>입니다. 들어있는 경로 4개도 동작을 보여주기 위한 예시라,
+    실제로 어떤 귀가 경로가 대표성을 갖는지는 사용자 조사로 정해야 합니다.
+  </div>
+  <p class="foot">Team 04 · 혁신기업경영 캡스톤디자인 II · 2026.10.13</p>
+</div>
+
+<script>
+/* ─────────── 데이터 ───────────
+   경로·구간 소요시간 = ODsay searchPubTransPathT 실제 응답 기반
+   last(막차 시각)     = 실측 전 샘플값                        */
+const LINE = {
+  "1호선":"#0052A4","2호선":"#00A84D","3호선":"#EF7C1C","4호선":"#00A5DE",
+  "9호선":"#BDB092","750B":"#3D5BAB","N15":"#003499"
+};
+const ROUTES = [
+  { id:"r1", name:"이대 정문 → 과천",
+    legs:[
+      {mode:"walk", name:"도보", from:"이대 정문", to:"이대후문 정류장", min:5},
+      {mode:"bus", name:"750B", from:"이대후문", to:"숙대입구역", min:18, last:"23:50"},
+      {mode:"walk", name:"환승 도보", from:"숙대입구역", to:"4호선 승강장", min:1},
+      {mode:"sub", name:"4호선", from:"숙대입구", to:"정부과천청사", min:27, last:"00:05"},
+      {mode:"walk", name:"도보", from:"정부과천청사", to:"집", min:6}
+    ],
+    alts:[{nm:"심야버스 N15", t:"52분", c:"2,500원"},{nm:"택시", t:"34분", c:"28,000원 안팎"}] },
+  { id:"r2", name:"신촌 → 양재 (2회 환승)",
+    legs:[
+      {mode:"walk", name:"도보", from:"출발지", to:"신촌역", min:5},
+      {mode:"sub", name:"2호선", from:"신촌", to:"교대", min:28, last:"00:10"},
+      {mode:"walk", name:"환승 도보", from:"2호선 승강장", to:"3호선 승강장", min:5},
+      {mode:"sub", name:"3호선", from:"교대", to:"양재", min:12, last:"00:25"}
+    ],
+    alts:[{nm:"심야버스 N15", t:"41분", c:"2,500원"},{nm:"택시", t:"22분", c:"17,000원 안팎"}] },
+  { id:"r3", name:"홍대입구 → 사당 (직통)",
+    legs:[
+      {mode:"walk", name:"도보", from:"출발지", to:"홍대입구역", min:4},
+      {mode:"sub", name:"2호선", from:"홍대입구", to:"사당", min:32, last:"00:12"},
+      {mode:"walk", name:"도보", from:"사당역", to:"집", min:7}
+    ],
+    alts:[{nm:"심야버스 N15", t:"48분", c:"2,500원"},{nm:"택시", t:"26분", c:"19,000원 안팎"}] },
+  { id:"r4", name:"종로 → 사당 (심야버스)",
+    legs:[
+      {mode:"walk", name:"도보", from:"출발지", to:"종로2가 정류장", min:6},
+      {mode:"bus", name:"N15", from:"종로2가", to:"사당역", min:35, last:"01:10"},
+      {mode:"walk", name:"도보", from:"사당역", to:"집", min:8}
+    ],
+    alts:[{nm:"택시", t:"29분", c:"21,000원 안팎"}] }
+];
+/* 배율 폭은 10/3 인터뷰 근거 — “발목 깁스한 상태인데 지도 앱 도보 시간과 차이가 많이 나서 막차를 놓쳤다” */
+const TEMPOS = [
+  {k:"많이 느림 (깁스·짐)", m:1.8}, {k:"느림", m:1.35}, {k:"보통", m:1.0},
+  {k:"조금 빠름", m:.85}, {k:"빠름", m:.75}
+];
+
+/* ─────────── 시각 유틸 ─────────── */
+const toMin = s => { const [h,m] = s.split(":").map(Number); return (h<4 ? h+24 : h)*60 + m; };
+const fmt = v => v==null ? "—" : `${String(Math.floor(v/60)%24).padStart(2,"0")}:${String(v%60).padStart(2,"0")}`;
+const walkOf = (leg,mul) => Math.max(1, Math.round(leg.min*mul));
+
+/* ─────────── 역산 판정 ─────────── */
+function judge(route, nowMin, mul){
+  const legs = route.legs, n = legs.length;
+  const req = new Array(n).fill(null);
+  let cuts = [], nxt = null;
+  for(let i=n-1;i>=0;i--){
+    const lg = legs[i];
+    if(lg.mode==="walk"){
+      req[i] = nxt==null ? null : nxt - walkOf(lg,mul);
+    } else {
+      const last = lg.last ? toMin(lg.last) : null;
+      const byNext = nxt==null ? null : nxt - lg.min;
+      const c = [last,byNext].filter(v=>v!=null);
+      req[i] = c.length ? Math.min(...c) : null;
+      if(last!=null && byNext!=null && byNext < last){
+        let cause = null;
+        for(let j=i+1;j<n;j++) if(legs[j].mode!=="walk" && legs[j].last){ cause = legs[j]; break; }
+        cuts.push({i, leg:lg, last, must:byNext, gap:last-byNext, cause});
+      }
+    }
+    nxt = req[i];
+  }
+  const deadline = req[0];
+  return { req, cuts, deadline, ok: deadline!=null && nowMin <= deadline,
+           margin: deadline==null ? null : deadline - nowMin };
+}
+
+/* ─────────── 렌더 ─────────── */
+const $ = s => document.querySelector(s);
+let state = { route:ROUTES[0].id, now:toMin("23:38"), tempo:2, timer:null };
+
+function render(){
+  const r = ROUTES.find(x=>x.id===state.route), mul = TEMPOS[state.tempo].m;
+  const res = judge(r, state.now, mul);
+
+  const v = $("#verdict");
+  v.className = "verdict " + (res.ok ? "go" : "stop");
+  const span = res.deadline==null ? 0 : Math.max(0, Math.min(1, (res.margin ?? 0)/30));
+  v.innerHTML = `
+    <div class="call">${res.ok ? "지금 나가면 탈 수 있어요" : "지금은 막차 연결이 어려워요"}</div>
+    <div class="dl-label">최종 출발 마감시각</div>
+    <div class="deadline">${fmt(res.deadline)}</div>
+    <div class="left">${res.ok
+        ? `여유 <b>${res.margin}분</b> · 현재 ${fmt(state.now)}`
+        : `마감이 <b>${Math.abs(res.margin)}분</b> 지났습니다 · 현재 ${fmt(state.now)}`}</div>
+    <div class="bar"><i style="width:${(res.ok?span:1)*100}%"></i></div>`;
+
+  $("#legs").innerHTML = r.legs.map((lg,i)=>{
+    const cut = res.cuts.find(c=>c.i===i);
+    const dur = lg.mode==="walk" ? walkOf(lg,mul) : lg.min;
+    const col = LINE[lg.name] || "#6b7280";
+    return `<div class="leg ${cut?"cut":""}">
+      <span class="chip ${lg.mode==="walk"?"walk":""}" ${lg.mode==="walk"?"":`style="background:${col}"`}>${lg.mode==="walk"?"도보":lg.name}</span>
+      <span class="grow">
+        <span class="nm">${lg.from} → ${lg.to}</span><br>
+        <span class="sub">${dur}분${lg.last?` · 막차 ${lg.last}`:""}</span>
+      </span>
+      <span class="rt"><span class="k">늦어도</span><br><span class="v">${fmt(res.req[i])}</span></span>
+    </div>`;
+  }).join("") + (res.cuts.length
+    ? `<div class="cutbox"><div class="h">끊기는 구간</div>${res.cuts.map(c=>`
+        <div class="body"><b>${c.leg.name} ${c.leg.from}→${c.leg.to}</b> — 막차는 ${fmt(c.last)}이지만
+        <b>${fmt(c.must)}</b>에 타야 합니다 (${c.gap}분 앞당김)</div>
+        ${c.cause?`<div class="why">↳ ${c.cause.name} ${c.cause.from}→${c.cause.to} 막차 ${c.cause.last}이 먼저 끊깁니다</div>`:""}`).join("")}</div>`
+    : `<div class="okbox">끊기는 구간 없음 — 모든 환승이 막차까지 연결됩니다.</div>`);
+
+  $("#calc").innerHTML = `<tr><th>구간</th><th>소요</th><th>막차</th><th>늦어도 시작</th></tr>` +
+    r.legs.map((lg,i)=>`<tr>
+      <td>${lg.mode==="walk"?"도보":lg.name}</td>
+      <td class="n">${lg.mode==="walk"?walkOf(lg,mul):lg.min}분</td>
+      <td class="n">${lg.last||"—"}</td>
+      <td class="n">${fmt(res.req[i])}</td></tr>`).join("");
+
+  $("#alts").innerHTML = r.alts.map(a=>`<div class="alt">
+      <span class="grow"><span class="nm">${a.nm}</span><br><span class="faint">${a.t} · ${a.c}</span></span>
+      <span class="tag">미검증</span></div>`).join("")
+    + `<div class="faint" style="padding-top:10px">실시간 요금·소요시간 연동은 최종 결과물 범위입니다.</div>`;
+}
+
+/* ─────────── 입력 ─────────── */
+$("#route").innerHTML = ROUTES.map(r=>`<option value="${r.id}">${r.name}</option>`).join("");
+$("#route").addEventListener("change", e => { state.route = e.target.value; render(); });
+$("#now").addEventListener("change", e => { if(e.target.value){ state.now = toMin(e.target.value); render(); } });
+$("#tempo").addEventListener("input", e => {
+  state.tempo = +e.target.value;
+  $("#tempoNow").textContent = TEMPOS[state.tempo].k;
+  render();
+});
+$("#play").addEventListener("click", e => {
+  const b = e.currentTarget;
+  if(state.timer){
+    clearInterval(state.timer); state.timer = null;
+    b.textContent = "▶ 재생"; b.classList.remove("on");
+  } else {
+    b.textContent = "❙❙ 멈춤"; b.classList.add("on");
+    state.timer = setInterval(()=>{
+      state.now += 1;
+      $("#now").value = fmt(state.now);
+      render();
+    }, 900);
+  }
+});
+
+render();
+</script>
+</body>
+</html>
