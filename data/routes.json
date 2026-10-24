@@ -1,0 +1,822 @@
+{
+  "_meta": {
+    "source": "조원 사용자 조사 최종본(2026-10-23) + 첨부 캡처 실측",
+    "generatedFrom": "index.html ROUTES",
+    "lastFormat": "HH:MM, 자정 이후는 00:xx. null = 미조사",
+    "validation": "역산 마감 vs 앱이 짠 출발시각, 평일·보통 걸음. 보류 2건 제외 9건 중 6건 5분 이내"
+  },
+  "busGapObservations": [
+    {
+      "route": "R03",
+      "stop": "잠실광역환승센터(24050)",
+      "line": "M2323",
+      "timetable": "00:08",
+      "predict": [
+        "23:50",
+        "23:55"
+      ],
+      "gapMin": 18
+    },
+    {
+      "route": "R04",
+      "stop": "연세대학교앞(13114)",
+      "line": "7737",
+      "timetable": "00:21",
+      "api": "00:11:12",
+      "predict": [
+        "23:54",
+        "23:55"
+      ],
+      "gapMin": 27
+    },
+    {
+      "route": "R04",
+      "stop": "홍대입구역(14016)",
+      "line": "1400",
+      "timetable": "00:32",
+      "predict": [
+        "23:44",
+        "23:52"
+      ],
+      "gapMin": 48
+    },
+    {
+      "route": "R09",
+      "stop": "운정중앙역(50180)",
+      "line": "074",
+      "timetable": "00:56",
+      "predict": [
+        "23:24",
+        "23:24"
+      ],
+      "gapMin": 92
+    },
+    {
+      "route": "R10",
+      "stop": "농생대(21293)",
+      "line": "5511",
+      "timetable": "23:35",
+      "predict": [
+        "23:45",
+        "23:46"
+      ],
+      "gapMin": -10
+    }
+  ],
+  "routes": [
+    {
+      "id": "R01",
+      "why": "수도권 최대 통근·통학 축",
+      "from": "스타벅스 몬테소리점",
+      "to": "수원역",
+      "legs": [
+        {
+          "mode": "walk",
+          "name": "도보",
+          "from": "스타벅스 몬테소리점",
+          "to": "강남역",
+          "min": 5,
+          "note": "314m"
+        },
+        {
+          "mode": "sub",
+          "name": "신분당선",
+          "from": "강남",
+          "to": "정자",
+          "min": 17,
+          "last": {
+            "weekday": "00:27",
+            "weekend": "23:54"
+          },
+          "dir": "양재역 방면 · 5개역"
+        },
+        {
+          "mode": "walk",
+          "name": "환승 도보",
+          "from": "신분당선",
+          "to": "수인분당선",
+          "min": 3,
+          "note": "62m"
+        },
+        {
+          "mode": "sub",
+          "name": "수인분당선",
+          "from": "정자",
+          "to": "수원",
+          "min": 39,
+          "last": {
+            "weekday": "23:38",
+            "weekend": "23:27"
+          },
+          "dir": "미금역 방면 · 15개역"
+        },
+        {
+          "mode": "walk",
+          "name": "도보",
+          "from": "수원역",
+          "to": "도착지",
+          "min": 2,
+          "note": "110m"
+        }
+      ],
+      "capture": {
+        "depart": "23:09",
+        "arrive": "00:19",
+        "app": "카카오맵"
+      },
+      "note": null,
+      "validation": {
+        "deadline": "23:13",
+        "appDepart": "23:09",
+        "diffMin": -4
+      }
+    },
+    {
+      "id": "R02",
+      "why": "심야 모임 최상위 출발지 + 서북부 베드타운",
+      "from": "스타벅스 홍대공항철도역점",
+      "to": "대화역",
+      "legs": [
+        {
+          "mode": "walk",
+          "name": "도보",
+          "from": "출발지",
+          "to": "홍대입구역",
+          "min": 5,
+          "note": "269m"
+        },
+        {
+          "mode": "sub",
+          "name": "경의중앙선",
+          "from": "홍대입구",
+          "to": "대곡",
+          "min": 21,
+          "last": {
+            "weekday": "23:26",
+            "weekend": "23:27"
+          },
+          "dir": "가좌역 방면 · 8개역"
+        },
+        {
+          "mode": "walk",
+          "name": "환승 도보",
+          "from": "경의중앙선",
+          "to": "3호선",
+          "min": 4,
+          "note": "139m"
+        },
+        {
+          "mode": "sub",
+          "name": "3호선",
+          "from": "대곡",
+          "to": "대화",
+          "min": 12,
+          "last": {
+            "weekday": "00:28",
+            "weekend": "23:47"
+          },
+          "dir": "백석역 방면 · 5개역"
+        }
+      ],
+      "capture": {
+        "depart": "23:21",
+        "arrive": "00:13",
+        "app": "카카오맵"
+      },
+      "note": null,
+      "validation": {
+        "deadline": "23:21",
+        "appDepart": "23:21",
+        "diffMin": 0
+      }
+    },
+    {
+      "id": "R03",
+      "why": "대학 도서관 출발 + 광역버스가 병목",
+      "from": "건국대 상허기념도서관",
+      "to": "평내호평역",
+      "legs": [
+        {
+          "mode": "walk",
+          "name": "도보",
+          "from": "상허기념도서관",
+          "to": "건대입구역",
+          "min": 11,
+          "note": "660m"
+        },
+        {
+          "mode": "sub",
+          "name": "2호선",
+          "from": "건대입구",
+          "to": "잠실",
+          "min": 8,
+          "last": {
+            "weekday": "00:46",
+            "weekend": "23:44"
+          },
+          "dir": "구의역 방면 · 4개역"
+        },
+        {
+          "mode": "walk",
+          "name": "환승 도보",
+          "from": "잠실역",
+          "to": "광역환승센터",
+          "min": 5,
+          "note": "323m"
+        },
+        {
+          "mode": "bus",
+          "name": "M2323",
+          "from": "잠실광역환승센터",
+          "to": "호평상업지구",
+          "min": 35,
+          "last": {
+            "weekday": "23:47",
+            "weekend": "23:40"
+          },
+          "uncertain": true
+        },
+        {
+          "mode": "walk",
+          "name": "도보",
+          "from": "호평상업지구",
+          "to": "평내호평역",
+          "min": 4,
+          "note": "264m"
+        }
+      ],
+      "capture": {
+        "depart": "23:37",
+        "arrive": "00:48",
+        "app": "카카오맵"
+      },
+      "note": "역산은 이미 늦었다고 판정(+14분). M2323 막차값 또는 캡처 시각 재확인 필요",
+      "validation": {
+        "deadline": "23:23",
+        "appDepart": "23:37",
+        "diffMin": 14
+      }
+    },
+    {
+      "id": "R04",
+      "why": "도서관 출발 + 인천 도착, 버스만 2회",
+      "from": "연세대 중앙도서관",
+      "to": "부평역",
+      "legs": [
+        {
+          "mode": "walk",
+          "name": "도보",
+          "from": "중앙도서관",
+          "to": "연세대학교앞",
+          "min": 10,
+          "note": "710m"
+        },
+        {
+          "mode": "bus",
+          "name": "7737",
+          "from": "연세대학교앞",
+          "to": "홍대입구역",
+          "min": 8,
+          "last": {
+            "weekday": "23:51",
+            "weekend": "23:59"
+          },
+          "uncertain": true
+        },
+        {
+          "mode": "walk",
+          "name": "환승 도보",
+          "from": "정류장",
+          "to": "정류장",
+          "min": 3,
+          "note": "169m"
+        },
+        {
+          "mode": "bus",
+          "name": "1400",
+          "from": "홍대입구역",
+          "to": "부평역",
+          "min": 39,
+          "last": {
+            "weekday": "23:48",
+            "weekend": "23:30"
+          },
+          "uncertain": true
+        },
+        {
+          "mode": "walk",
+          "name": "도보",
+          "from": "부평역",
+          "to": "도착지",
+          "min": 9,
+          "note": "551m"
+        }
+      ],
+      "capture": {
+        "depart": "23:32",
+        "arrive": "01:00",
+        "app": "카카오맵"
+      },
+      "note": null,
+      "validation": {
+        "deadline": "23:27",
+        "appDepart": "23:32",
+        "diffMin": 5
+      }
+    },
+    {
+      "id": "R05",
+      "why": "대학로 심야 귀가 + 경기 북부 최대 도착지",
+      "from": "방송통신대 대학본부",
+      "to": "의정부역",
+      "legs": [
+        {
+          "mode": "walk",
+          "name": "도보",
+          "from": "대학본부",
+          "to": "혜화역",
+          "min": 8,
+          "note": "491m"
+        },
+        {
+          "mode": "sub",
+          "name": "4호선",
+          "from": "혜화",
+          "to": "창동",
+          "min": 18,
+          "last": {
+            "weekday": "00:40",
+            "weekend": "23:40"
+          },
+          "dir": "한성대입구역 방면 · 8개역"
+        },
+        {
+          "mode": "walk",
+          "name": "환승 도보",
+          "from": "4호선",
+          "to": "1호선",
+          "min": 3,
+          "note": "50m"
+        },
+        {
+          "mode": "sub",
+          "name": "1호선",
+          "from": "창동",
+          "to": "의정부",
+          "min": 14,
+          "last": {
+            "weekday": "00:10",
+            "weekend": "00:12"
+          },
+          "dir": "방학역 방면 · 6개역"
+        }
+      ],
+      "capture": {
+        "depart": "23:40",
+        "arrive": "00:25",
+        "app": "카카오맵"
+      },
+      "note": null,
+      "validation": {
+        "deadline": "23:41",
+        "appDepart": "23:40",
+        "diffMin": -1
+      }
+    },
+    {
+      "id": "R06",
+      "why": "사당 환승 허브 + 신분당선 통학지",
+      "from": "KB국민은행 사당동센터",
+      "to": "수지구청역",
+      "legs": [
+        {
+          "mode": "walk",
+          "name": "도보",
+          "from": "출발지",
+          "to": "사당역",
+          "min": 6,
+          "note": "355m"
+        },
+        {
+          "mode": "sub",
+          "name": "2호선",
+          "from": "사당",
+          "to": "강남",
+          "min": 9,
+          "last": {
+            "weekday": "00:45",
+            "weekend": "23:46"
+          },
+          "dir": "방배역 방면 · 4개역"
+        },
+        {
+          "mode": "walk",
+          "name": "환승 도보",
+          "from": "2호선",
+          "to": "신분당선",
+          "min": 4,
+          "note": "178m"
+        },
+        {
+          "mode": "sub",
+          "name": "신분당선",
+          "from": "강남",
+          "to": "수지구청",
+          "min": 25,
+          "last": {
+            "weekday": "00:03",
+            "weekend": "23:30"
+          },
+          "dir": "양재역 방면 · 8개역"
+        }
+      ],
+      "capture": {
+        "depart": "23:35",
+        "arrive": "00:29",
+        "app": "카카오맵"
+      },
+      "note": null,
+      "validation": {
+        "deadline": "23:44",
+        "appDepart": "23:35",
+        "diffMin": -9
+      }
+    },
+    {
+      "id": "R07",
+      "why": "야근 1순위 업무지구 + 대안 빈약한 도착지",
+      "from": "IFC서울",
+      "to": "운양역",
+      "legs": [
+        {
+          "mode": "walk",
+          "name": "도보",
+          "from": "Two IFC",
+          "to": "여의도역",
+          "min": 7,
+          "note": "417m"
+        },
+        {
+          "mode": "sub",
+          "name": "9호선 급행",
+          "from": "여의도",
+          "to": "김포공항",
+          "min": 19,
+          "last": {
+            "weekday": "00:46",
+            "weekend": null
+          },
+          "dir": "당산역 방면 · 5개역"
+        },
+        {
+          "mode": "walk",
+          "name": "환승 도보·대기",
+          "from": "9호선",
+          "to": "김포골드라인",
+          "min": 6,
+          "note": "255m + 대기 3분"
+        },
+        {
+          "mode": "sub",
+          "name": "김포골드라인",
+          "from": "김포공항",
+          "to": "운양",
+          "min": 19,
+          "last": {
+            "weekday": "00:29",
+            "weekend": null
+          },
+          "dir": "고촌역 방면 · 5개역"
+        }
+      ],
+      "capture": {
+        "depart": "23:56",
+        "arrive": "00:48",
+        "app": "네이버지도"
+      },
+      "note": null,
+      "validation": {
+        "deadline": "23:57",
+        "appDepart": "23:56",
+        "diffMin": -1
+      }
+    },
+    {
+      "id": "R08",
+      "why": "야근 잦은 직장 밀집지 + 최외곽 신도시, GTX 포함",
+      "from": "숭실대입구역",
+      "to": "동탄역",
+      "legs": [
+        {
+          "mode": "sub",
+          "name": "7호선",
+          "from": "숭실대입구",
+          "to": "고속터미널",
+          "min": 9,
+          "last": {
+            "weekday": "00:16",
+            "weekend": null
+          },
+          "dir": "남성역 방면 · 4개역"
+        },
+        {
+          "mode": "walk",
+          "name": "환승 도보",
+          "from": "7호선",
+          "to": "3호선",
+          "min": 4,
+          "note": "110m"
+        },
+        {
+          "mode": "sub",
+          "name": "3호선",
+          "from": "고속터미널",
+          "to": "수서",
+          "min": 20,
+          "last": {
+            "weekday": "00:40",
+            "weekend": null
+          },
+          "dir": "교대역 방면"
+        },
+        {
+          "mode": "walk",
+          "name": "환승 도보",
+          "from": "3호선",
+          "to": "GTX-A",
+          "min": 4,
+          "note": "127m"
+        },
+        {
+          "mode": "sub",
+          "name": "GTX-A",
+          "from": "수서",
+          "to": "동탄",
+          "min": 21,
+          "last": {
+            "weekday": "00:39",
+            "weekend": null
+          },
+          "dir": "성남역 방면 · 3개역"
+        },
+        {
+          "mode": "walk",
+          "name": "도보",
+          "from": "동탄역",
+          "to": "도착지",
+          "min": 1,
+          "note": "62m"
+        }
+      ],
+      "capture": {
+        "depart": "23:15",
+        "arrive": "00:37",
+        "app": "카카오맵"
+      },
+      "note": "문서 텍스트는 가산디지털단지역·23:52 출발이었으나 캡처는 숭실대입구역·23:15. 캡처 기준",
+      "validation": {
+        "deadline": "00:02",
+        "appDepart": "23:15",
+        "diffMin": -47
+      }
+    },
+    {
+      "id": "R09",
+      "why": "심야 상권 + 3개 노선 환승역 출발, 서북 최외곽",
+      "from": "동국대 중앙도서관",
+      "to": "운정역",
+      "legs": [
+        {
+          "mode": "walk",
+          "name": "도보",
+          "from": "중앙도서관",
+          "to": "충무로역",
+          "min": 13,
+          "note": "815m"
+        },
+        {
+          "mode": "sub",
+          "name": "4호선",
+          "from": "충무로",
+          "to": "서울역",
+          "min": 4,
+          "last": {
+            "weekday": "00:09",
+            "weekend": null
+          },
+          "dir": "명동역 방면 · 3개역"
+        },
+        {
+          "mode": "walk",
+          "name": "환승 도보·대기",
+          "from": "4호선",
+          "to": "GTX-A",
+          "min": 12,
+          "note": "500m + 대기 5분"
+        },
+        {
+          "mode": "sub",
+          "name": "GTX-A",
+          "from": "서울역",
+          "to": "운정중앙",
+          "min": 21,
+          "last": {
+            "weekday": "00:38",
+            "weekend": null
+          },
+          "dir": "연신내역 방면 · 4개역"
+        },
+        {
+          "mode": "walk",
+          "name": "환승 도보",
+          "from": "운정중앙역",
+          "to": "정류장",
+          "min": 2,
+          "note": "65m"
+        },
+        {
+          "mode": "bus",
+          "name": "074",
+          "from": "운정중앙역",
+          "to": "운정역",
+          "min": 17,
+          "last": {
+            "weekday": null,
+            "weekend": null
+          },
+          "uncertain": true
+        },
+        {
+          "mode": "walk",
+          "name": "도보",
+          "from": "운정역",
+          "to": "도착지",
+          "min": 2,
+          "note": "93m"
+        }
+      ],
+      "capture": {
+        "depart": "23:55",
+        "arrive": "01:14",
+        "app": "네이버지도"
+      },
+      "note": null,
+      "validation": null
+    },
+    {
+      "id": "R10",
+      "why": "대학가 상권 + 한양대 ERICA 통학지",
+      "from": "서울대 관정도서관",
+      "to": "한대앞역",
+      "daytime": true,
+      "legs": [
+        {
+          "mode": "walk",
+          "name": "도보",
+          "from": "관정도서관",
+          "to": "농생대",
+          "min": 7,
+          "note": "456m"
+        },
+        {
+          "mode": "bus",
+          "name": "5511",
+          "from": "농생대",
+          "to": "서울대입구역",
+          "min": 10,
+          "last": {
+            "weekday": null,
+            "weekend": null
+          },
+          "uncertain": true
+        },
+        {
+          "mode": "walk",
+          "name": "환승 도보",
+          "from": "정류장",
+          "to": "서울대입구역",
+          "min": 4,
+          "note": "139m"
+        },
+        {
+          "mode": "sub",
+          "name": "2호선",
+          "from": "서울대입구",
+          "to": "사당",
+          "min": 4,
+          "last": {
+            "weekday": "00:40",
+            "weekend": null
+          },
+          "dir": "낙성대역 방면 · 2개역"
+        },
+        {
+          "mode": "walk",
+          "name": "환승 도보·대기",
+          "from": "2호선",
+          "to": "4호선",
+          "min": 3,
+          "note": "111m + 대기 1분"
+        },
+        {
+          "mode": "sub",
+          "name": "4호선",
+          "from": "사당",
+          "to": "한대앞",
+          "min": 42,
+          "last": {
+            "weekday": "00:20",
+            "weekend": null
+          },
+          "dir": "남태령역 방면 · 16개역"
+        }
+      ],
+      "capture": {
+        "depart": "11:48",
+        "arrive": "13:03",
+        "app": "네이버지도"
+      },
+      "note": "캡처가 주간(11:48) 조회. 소요시간은 주간 기준이며 5511 '막차통과' 표시",
+      "validation": null
+    },
+    {
+      "id": "R11",
+      "why": "대조군 — 실제로는 전 구간 막차 탑승",
+      "from": "서울대 행정관",
+      "to": "범계역",
+      "legs": [
+        {
+          "mode": "walk",
+          "name": "도보",
+          "from": "행정관",
+          "to": "관악산역",
+          "min": 19,
+          "note": "1.3km"
+        },
+        {
+          "mode": "sub",
+          "name": "신림선",
+          "from": "관악산",
+          "to": "신림",
+          "min": 5,
+          "last": {
+            "weekday": "23:32",
+            "weekend": null
+          },
+          "dir": "서울대벤처타운역 방면 · 3개역"
+        },
+        {
+          "mode": "walk",
+          "name": "환승 도보·대기",
+          "from": "신림선",
+          "to": "2호선",
+          "min": 15,
+          "note": "389m + 대기 10분"
+        },
+        {
+          "mode": "sub",
+          "name": "2호선",
+          "from": "신림",
+          "to": "사당",
+          "min": 7,
+          "last": {
+            "weekday": "23:52",
+            "weekend": null
+          },
+          "dir": "봉천역 방면 · 4개역"
+        },
+        {
+          "mode": "walk",
+          "name": "환승 도보·대기",
+          "from": "2호선",
+          "to": "4호선",
+          "min": 7,
+          "note": "111m + 대기 5분"
+        },
+        {
+          "mode": "sub",
+          "name": "4호선",
+          "from": "사당",
+          "to": "범계",
+          "min": 21,
+          "last": {
+            "weekday": "00:06",
+            "weekend": null
+          },
+          "dir": "남태령역 방면 · 9개역"
+        }
+      ],
+      "capture": {
+        "depart": "23:12",
+        "arrive": "00:27",
+        "app": "네이버지도"
+      },
+      "note": "대조군으로 선정됐으나 실제로는 신림선·2호선·4호선 전 구간 막차 탑승",
+      "validation": {
+        "deadline": "23:13",
+        "appDepart": "23:12",
+        "diffMin": -1
+      }
+    }
+  ]
+}
