@@ -325,6 +325,8 @@ td.n{font-variant-numeric:tabular-nums; white-space:nowrap; font-weight:500}
 .rtbtn{flex:0 0 auto; text-align:right; background:none; border:0; padding:4px 0 4px 8px; min-height:44px; min-width:76px}
 .rtbtn .k{display:block; font-size:11.5px; color:var(--muted); font-weight:700}
 .rtbtn .v{display:block; font-size:14.5px; font-weight:800; font-variant-numeric:tabular-nums}
+.leg .rt.done .k{color:var(--mint-ink)}
+.leg .rt.done .v{color:var(--muted); font-weight:700}
 .rtbtn.past .v{color:var(--muted); text-decoration:line-through; font-weight:500}
 .devbtn{background:none; border:0; padding:6px 2px; font-size:12px; color:var(--muted); text-decoration:underline; text-underline-offset:3px}
 .devbtn[aria-pressed=true]{color:var(--mint-ink); font-weight:700}
@@ -758,7 +760,7 @@ function render(){
       ? (mul!==1 ? nw(`지도 앱 ${lg.min}분 → 내 걸음 ${d}분`) : `${d}분`) + (lg.note?` · ${lg.note}`:"")
       : `${d}분${lg.dir?` · ${lg.dir}`:""}${raw?` · ${nw("막차 "+raw)}`:""}`;
     let etaLine="";
-    if(!walk && raw && (!state.trip || i>=cur)){
+    if(!walk && raw && (!state.trip || i>cur)){
       const gap = Math.round((toMin(raw) - eta[i])*60);
       etaLine = `<span class="eta ${gap<0?"late":""}">${nw("도착 예상 "+fmt(Math.floor(eta[i])))} · ${gap>=0 ? nw("막차까지 "+short(gap)+" 여유") : nw("막차보다 "+short(-gap)+" 늦어요")}</span>`;
     }
@@ -772,11 +774,12 @@ function render(){
     ].join("");
     let rt="";
     if(miss) rt = `<span class="rt"><span class="k">막차</span><span class="v">미확인</span></span>`;
+    else if(cur!=null && i<cur) rt = `<span class="rt done"><span class="k">${walk?"도착 완료":"하차 완료"}</span><span class="v">${fmt(Math.floor(eta[i+1]))}</span></span>`;
     else if(cur===i && !walk) rt = `<span class="rt"><span class="k">탑승 중 · 하차 예정</span><span class="v">${fmt(Math.floor(eta[i+1]))}</span></span>`;
     else if(res.req[i]!=null){
       const left = res.req[i]*60 - state.nowS;
       const past = left<0 || (cur!=null && i<cur);
-      const k = past ? "지남" : state.abs ? (walk?"늦어도 출발":"늦어도 탑승") : (walk?"출발까지":"탑승까지");
+      const k = past ? (walk?"출발 마감 지남":"탑승 마감 지남") : state.abs ? (walk?"늦어도 출발":"늦어도 탑승") : (walk?"출발까지":"탑승까지");
       const val = past || state.abs ? fmt(res.req[i]) : short(left);
       rt = `<button type="button" class="rtbtn ${past?"past":""}" data-abs aria-label="${k} ${val}. 눌러서 ${state.abs?"남은 시간":"시각"}으로 보기"><span class="k">${k}</span><span class="v">${val}</span></button>`;
     } else if(walk && !legs.slice(i+1).some(x=>x.mode!=="walk")) rt = `<span class="rt"><span class="k">도착까지</span><span class="v">${d}분</span></span>`;
