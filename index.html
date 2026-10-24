@@ -330,13 +330,38 @@ td.n{font-variant-numeric:tabular-nums; white-space:nowrap; font-weight:500}
 .rtbtn.past .v{color:var(--muted); text-decoration:line-through; font-weight:500}
 .devbtn{background:none; border:0; padding:6px 2px; font-size:12px; color:var(--muted); text-decoration:underline; text-underline-offset:3px}
 .devbtn[aria-pressed=true]{color:var(--mint-ink); font-weight:700}
+/* 가는 길 (세로 노선도) */
+.rbox .card{padding:22px 16px 28px}
+.rline{position:relative; margin-left:112px}
+.seg{position:absolute; left:-3px; width:6px; border-radius:3px}
+.seg.walk{background:repeating-linear-gradient(#c4c9d0 0 6px, transparent 6px 11px)}
+.node{position:absolute; left:0; transform:translateY(-50%); display:flex; align-items:center; gap:12px}
+.node b{width:14px; height:14px; border-radius:50%; background:#fff; border:2.5px solid #9ca3af; margin-left:-7px; flex:0 0 auto}
+.node.done b{border-color:var(--mint-ink); background:var(--mint-ink)}
+.node .nl{font-size:13.5px; font-weight:700; white-space:nowrap}
+.node.done .nl{color:var(--muted); font-weight:600}
+.node.next .nl{font-weight:800}
+.mk{position:absolute; left:0; top:0; z-index:2; transition:transform .3s linear}
+.mki{position:absolute; left:-17px; top:-17px; width:34px; height:34px; border-radius:11px; background:var(--black); color:#fff;
+     display:grid; place-items:center; box-shadow:0 4px 10px rgba(10,10,10,.25)}
+.mki svg{width:20px; height:20px}
+.bub{position:absolute; right:26px; top:-15px; white-space:nowrap; background:var(--mint-ink); color:#fff; font-size:12.5px;
+     font-weight:800; padding:6px 11px; border-radius:14px; font-variant-numeric:tabular-nums}
+.bub::after{content:""; position:absolute; right:-5px; top:50%; margin-top:-5px; border:5px solid transparent; border-right:0; border-left-color:var(--mint-ink)}
+@media (prefers-reduced-motion:reduce){ .mk{transition:none} }
+.toastx{position:fixed; left:50%; bottom:calc(18px + env(safe-area-inset-bottom,0px)); transform:translateX(-50%); z-index:50;
+        width:calc(100% - 32px); max-width:448px; background:var(--black); color:#fff; border-radius:14px; padding:14px 16px;
+        font-size:15px; font-weight:800; box-shadow:0 10px 30px rgba(10,10,10,.3); animation:toastUp .35s cubic-bezier(.16,1,.3,1)}
+.toastx small{display:block; font-size:12.5px; font-weight:600; color:var(--ink-soft); margin-top:2px}
+@keyframes toastUp{from{transform:translate(-50%,16px); opacity:0}to{transform:translate(-50%,0); opacity:1}}
+@media (prefers-reduced-motion:reduce){ .toastx{animation:none} }
 </style>
 </head>
 <body>
 <div class="shell">
   <header class="top">
     <h1 class="brand">라스트<span class="accent">레인</span></h1>
-    <span class="pill">v0.8</span>
+    <span class="pill">v0.9</span>
     <span class="spacer"></span>
     <span class="who">Team 04</span>
   </header>
@@ -414,6 +439,7 @@ td.n{font-variant-numeric:tabular-nums; white-space:nowrap; font-weight:500}
     <p id="sr" class="sr-only" aria-live="polite"></p>
 
 
+  <section id="routeBox" class="rbox" hidden aria-label="가는 길"></section>
   <h2 class="sec">구간별 연결</h2>
   <div class="card" style="padding:4px 18px 6px">
     <p class="faint" id="dayNote" style="padding-top:10px" hidden></p>
@@ -472,6 +498,7 @@ td.n{font-variant-numeric:tabular-nums; white-space:nowrap; font-weight:500}
   <button type="button" class="btn primary block foot-btn" data-close>완료</button>
 </dialog>
 
+<div class="toastx" id="toastx" role="alert" hidden></div>
 <script>
 /* ─────────── 노선 색 ─────────── */
 const LINE = {
@@ -813,6 +840,8 @@ function render(){
       <td class="n">${lg.mode==="walk"?walkOf(lg,mul):lg.min}분</td>
       <td class="n">${lastOf(lg,day) || (lg.mode==="walk"?"—":"미확인")}</td>
       <td class="n">${fmt(res.req[i])}</td></tr>`).join("");
+  renderRoute(r, legs, eta, cur, day);
+
   /* 출발했어요 모드 */
   const tb=$("#tripBtn"), ban=$("#tripBanner");
   tb.hidden = !state.trip && !(kind==="go" || kind==="plan");
@@ -834,6 +863,53 @@ function render(){
     if(state.tripLeg!==cur){ state.tripLeg=cur; $("#sr").textContent = msg; try{ navigator.vibrate && navigator.vibrate(120); }catch(e){} }
   }
   return {kind, rem};
+}
+
+/* 가는 길: 구간 끝점을 정류장으로 그리고, 지금 위치를 구간 안에서 시간 비율로 옮긴다 */
+const ie = w => { const c=w.charCodeAt(w.length-1)-0xAC00; return w + ((c>=0&&c<=11171&&c%28!==0) ? "이에요" : "예요"); };
+const TRAIN='<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="4" y="2.5" width="12" height="12.5" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M4.5 9h11" stroke="currentColor" stroke-width="1.6"/><circle cx="7.5" cy="12" r="1" fill="currentColor"/><circle cx="12.5" cy="12" r="1" fill="currentColor"/><path d="M7 15.5L5.5 18M13 15.5l1.5 2.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
+const WALKER='<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="11" cy="3.6" r="1.9" fill="currentColor"/><path d="M10.5 7l-2.2 4.2 2.7 2.3-1 4.5M10.5 7l2.4 2.4 2.6.6M8.3 11.2L6 17.5M10.5 7L7.6 8.6 6.3 11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const SEG=64;
+function stopCount(lg){ const m=(lg.dir||"").match(/(\d+)개역/); return m ? +m[1] : null; }
+function showToast(main, sub){ const t=$("#toastx"); t.innerHTML = esc(main) + (sub?`<small>${esc(sub)}</small>`:""); t.hidden=false;
+  t.style.animation="none"; void t.offsetWidth; t.style.animation="";
+  try{ navigator.vibrate && navigator.vibrate([120,60,120]); }catch(e){}
+  clearTimeout(showToast.tm); showToast.tm=setTimeout(()=>{ t.hidden=true; }, 4500); }
+function renderRoute(r, legs, eta, cur, day){
+  const box=$("#routeBox");
+  if(!state.trip){ box.hidden=true; box.dataset.key=""; $("#toastx").hidden=true; return; }
+  box.hidden=false;
+  const key=[state.route, state.tempo, state.trip.start].join("|");
+  if(box.dataset.key!==key){
+    box.dataset.key=key; state.alerted={};
+    const label = i => { if(i===0) return legs[0].from;
+      const prev=legs[i-1], next=legs[i];
+      if(i===legs.length) return prev.mode==="walk" ? `도착 · ${r.to}` : stationTo(prev);
+      if(prev.mode==="walk" && next.mode!=="walk") return `${station(next)} · ${next.name}`;
+      return prev.mode==="walk" ? prev.to : stationTo(prev); };
+    box.innerHTML = `<h2 class="sec">가는 길</h2><div class="card"><div class="rline" style="height:${legs.length*SEG}px">`
+      + legs.map((l,i)=>`<i class="seg ${l.mode==="walk"?"walk":""}" style="top:${i*SEG}px;height:${SEG}px;${l.mode!=="walk"?`background:${LINE[l.name]||"#6b7280"}`:""}"></i>`).join("")
+      + legs.concat([null]).map((_,i)=>`<span class="node" style="top:${i*SEG}px"><b></b><span class="nl">${esc(label(i))}</span></span>`).join("")
+      + `<span class="mk" id="mk"><span class="mki" id="mki"></span><span class="bub" id="bub"></span></span></div></div>`;
+  }
+  const m=state.nowS/60; let y, txt;
+  if(cur>=legs.length){ y=legs.length*SEG; txt="도착했어요"; $("#mki").innerHTML=WALKER; }
+  else {
+    const lg=legs[cur], f=Math.min(1, Math.max(0, (m-eta[cur])/(eta[cur+1]-eta[cur])));
+    const leftS=Math.max(0, Math.round((eta[cur+1]-m)*60)), n=stopCount(lg);
+    y=(cur+f)*SEG;
+    $("#mki").innerHTML = lg.mode==="walk" ? WALKER : TRAIN;
+    txt = lg.mode==="walk" ? `${Math.max(1,Math.ceil(leftS/60))}분 걸으면 도착`
+        : n ? `약 ${Math.max(1, Math.ceil(n*(1-f)))}개역 남음` : `하차까지 ${Math.max(1,Math.ceil(leftS/60))}분`;
+    /* 내리기 한 역 전쯤(역 간 평균 시간 이내) 알림 — 역 수를 모르면 2분 전 */
+    if(lg.mode!=="walk" && !state.alerted[cur] && leftS <= (n ? lg.min*60/n : 120)){
+      state.alerted[cur]=true;
+      const nx=legs.slice(cur+1).find(x=>x.mode!=="walk");
+      showToast(`다음은 ${ie(stationTo(lg))}. 내릴 준비하세요`, nx ? `${station(nx)}에서 ${ro(nx.name)} 갈아타요` : "곧 도착해요");
+    }
+  }
+  $("#mk").style.transform=`translateY(${y}px)`; $("#bub").textContent=txt;
+  box.querySelectorAll(".node").forEach((el,i)=>{ el.classList.toggle("done", i<=Math.min(cur,legs.length) && i<=cur); el.classList.toggle("next", i===cur+1); });
 }
 
 /* 노선색 위 글자색: 흰색·검정 중 대비가 높은 쪽 */
