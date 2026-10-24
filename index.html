@@ -14,13 +14,14 @@
 </style>
 <title>라스트레인</title>
 <style>
-/* 레이아웃: 폰 폭 한 칸. 색·라운드·버튼은 LibMatch 테마. */
+/* 레이아웃: 폰 폭 한 칸. 색·라운드·버튼은 LibMatch 테마.
+   의미색: 민트 = 탈 수 있음 · 잉크(검정) = 끊김 · 점선 회색 = 모름.
+   빨강·노랑·초록은 노선 고유색에만 쓴다(겹치면 노선과 경고가 헷갈림). */
 :root{
   --black:#0a0a0a; --white:#f7f7f5;
   --mint:#3ECFB2; --mint-dark:#2BA891; --mint-light:#E8FAF6; --mint-ink:#11705F;
   --gray:#6b7280; --muted:#4b5563; --gray-light:#f3f4f6; --gray-border:#e5e7eb; --dark-gray:#374151;
-  --amber:#F59E0B; --amber-light:#FEF3C7; --amber-ink:#92400E; --amber-deep:#78350F;
-  --red:#DC2626; --red-light:#FEE2E2; --red-ink:#B91C1C; --red-deep:#7F1D1D;
+  --ink-soft:#d1d5db;
   --sans:'Pretendard',-apple-system,BlinkMacSystemFont,system-ui,'Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',sans-serif;
   color-scheme:light;
 }
@@ -32,6 +33,10 @@ body{background:var(--white); color:var(--black); font-family:var(--sans);
 p{margin:0}
 .shell{max-width:480px; margin:0 auto; padding-inline:16px; padding-block:0 40px}
 .sr-only{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
+.nw{white-space:nowrap}
+.grow{flex:1; min-width:0}
+.faint{font-size:12.5px; color:var(--muted)}
+.ico{width:18px; height:18px; flex:0 0 auto}
 
 .top{position:sticky; top:env(safe-area-inset-top,0px); z-index:20; background:var(--white);
      border-bottom:1px solid var(--gray-border); margin-inline:-16px; padding:14px 16px 12px;
@@ -45,19 +50,19 @@ p{margin:0}
 
 .card{background:#fff; border:1px solid var(--gray-border); border-radius:12px; padding:18px}
 h2.sec{font-size:13px; font-weight:700; color:var(--dark-gray); margin:28px 0 10px; letter-spacing:-.2px}
-.grow{flex:1; min-width:0}
-.faint{font-size:12.5px; color:var(--muted)}
 
-label.fld,.fld{display:block; font-size:12.5px; color:var(--dark-gray); font-weight:700; margin-bottom:6px}
-select,input[type=time]{width:100%; min-width:0; min-height:46px; background:#fff; color:var(--black);
-  font-family:inherit; font-size:15px; font-weight:500;
+input[type=time],input[type=search]{width:100%; min-width:0; min-height:46px; background:#fff; color:var(--black);
+  font-family:inherit; font-size:16px; font-weight:500;
   border:1px solid var(--gray-border); border-radius:10px; padding:11px 12px}
-select:focus,input:focus{border-color:var(--mint-ink)}
-select:focus:not(:focus-visible),input:focus:not(:focus-visible){outline:none}
+input[type=search]{-webkit-appearance:none; appearance:none}
+input[type=search]::-webkit-search-cancel-button{display:none}
+input:focus{border-color:var(--mint-ink)}
+input:focus:not(:focus-visible){outline:none}
 :focus-visible{outline:2px solid var(--mint-ink); outline-offset:2px}
 input[type=range]{width:100%; height:36px; accent-color:var(--mint); margin:0; cursor:pointer}
+label.fld,.fld{display:block; font-size:12.5px; color:var(--dark-gray); font-weight:700; margin-bottom:6px}
 
-button{font-family:inherit; cursor:pointer}
+button{font-family:inherit; cursor:pointer; color:inherit}
 .btn{display:inline-flex; align-items:center; justify-content:center; gap:7px; min-height:46px;
      background:#fff; color:var(--dark-gray); border:1px solid var(--gray-border);
      border-radius:10px; padding:11px 14px; font-size:14px; font-weight:700; white-space:nowrap;
@@ -65,38 +70,70 @@ button{font-family:inherit; cursor:pointer}
 .btn:hover{background:var(--gray-light)}
 .btn svg{width:16px; height:16px; flex:0 0 auto}
 .btn.on{background:var(--mint); border-color:var(--mint); color:var(--black)}
-.btn.on:hover{background:var(--mint)}
+.btn.primary{background:var(--mint); border-color:var(--mint); color:var(--black)}
+.btn.primary:hover{background:var(--mint-ink); border-color:var(--mint-ink); color:#fff}
+.btn.block{width:100%}
 
-/* 접히는 패널 공통 (설정 · 시연) */
-details.fold{border-radius:12px}
-details.fold > summary{list-style:none; cursor:pointer; display:flex; align-items:center; gap:10px;
-  min-height:52px; padding:10px 14px}
-details.fold > summary::-webkit-details-marker{display:none}
-.chev{width:16px; height:16px; flex:0 0 auto; color:var(--muted); transition:transform .2s ease}
-details[open] > summary .chev{transform:rotate(180deg)}
-@media (prefers-reduced-motion:reduce){ .chev{transition:none} }
+/* ── 검색 (LibMatch 검색행 구조) ── */
+.where{margin-top:16px; background:#fff; border:1px solid var(--gray-border); border-radius:14px; padding:18px 16px 16px}
+.where h2{font-size:22px; font-weight:800; letter-spacing:-.6px; margin:0 0 14px}
+.from{display:flex; align-items:center; gap:10px; width:100%; min-height:48px; padding:8px 12px;
+      background:var(--gray-light); border:1px solid var(--gray-border); border-radius:10px; text-align:left; margin-bottom:8px}
+.from .k{font-size:12px; font-weight:700; color:var(--muted); flex:0 0 auto}
+.from .v{font-size:14.5px; font-weight:700}
+.from .go{font-size:12.5px; font-weight:700; color:var(--mint-ink); flex:0 0 auto}
+.search-row{display:flex; gap:8px}
+.search-row input{border-width:2px; font-size:16px; padding:12px 14px}
+.hint{margin-top:14px; font-size:12.5px; color:var(--muted)}
+.hint .chips{display:flex; flex-wrap:wrap; gap:6px; margin-top:8px}
+.sug{background:var(--gray-light); border:1px solid var(--gray-border); border-radius:20px;
+     padding:7px 13px; font-size:13px; font-weight:600; color:var(--black); min-height:36px;
+     transition:background .15s,border-color .15s}
+.sug:hover{background:var(--mint-light); border-color:var(--mint)}
+.sug b{font-weight:800}
+.matches{margin-top:10px; border-top:1px solid var(--gray-border)}
+.match{display:flex; align-items:center; gap:10px; width:100%; text-align:left; background:none; border:0;
+       border-bottom:1px solid var(--gray-border); padding:12px 2px; min-height:52px}
+.match .t{font-size:15px; font-weight:700}
+.match .s{display:block; font-size:12.5px; color:var(--muted)}
+.empty{margin-top:12px; padding:16px; border:1.5px dashed #c4c9d0; border-radius:12px; text-align:center}
+.empty .h{font-size:15px; font-weight:800}
+.empty p{font-size:13px; color:var(--muted); margin-top:4px}
 
-.setup{margin-top:14px; background:#fff; border:1px solid var(--gray-border)}
-.setup .sum-meta .warn{color:var(--amber-ink); font-weight:700}
-.setup .sum-route{display:block; font-size:14.5px; font-weight:700; letter-spacing:-.2px;
-       white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-.setup .sum-meta{display:block; font-size:12.5px; color:var(--dark-gray); margin-top:1px}
-.setup .chg{font-size:12.5px; font-weight:700; color:var(--mint-ink); flex:0 0 auto}
-.setup .body{padding:4px 14px 16px}
-.setup .body > div + div{margin-top:14px}
+/* ── 선택 후 상단 바 + 조건 칩 (렌터카 레퍼런스의 검색 바 + 칩 줄) ── */
+.qbar{margin-top:16px; display:flex; align-items:center; gap:10px; width:100%; text-align:left;
+      background:#fff; border:2px solid var(--black); border-radius:12px; padding:10px 14px; min-height:58px}
+.qbar .t{display:block; font-size:16px; font-weight:800; letter-spacing:-.3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.qbar .s{display:block; font-size:12.5px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.qbar .chg{font-size:12.5px; font-weight:700; color:var(--mint-ink); flex:0 0 auto}
+.conds{display:flex; gap:8px; margin-top:10px; flex-wrap:wrap}
+.cond{display:inline-flex; align-items:center; gap:6px; background:#fff; border:1px solid var(--gray-border);
+      border-radius:20px; padding:8px 12px 8px 14px; min-height:40px; font-size:13.5px; font-weight:700; color:var(--black)}
+.cond .chev{width:14px; height:14px}
+.cond .warn{font-size:12px; font-weight:800; color:var(--black); background:var(--gray-light); border-radius:10px; padding:0 6px}
 
-/* 요일 세그먼트 */
-.seg{display:flex; background:var(--gray-light); border:1px solid var(--gray-border);
-     border-radius:10px; padding:3px; gap:3px}
-.seg button{flex:1; min-height:40px; border:0; background:none; border-radius:8px; padding:8px 4px;
-            font-size:14px; font-weight:700; color:var(--muted)}
-.seg button[aria-pressed=true]{background:#fff; color:var(--black); box-shadow:0 1px 2px rgba(0,0,0,.08)}
-.seg button{min-height:44px}
-.seg .today{font-size:11.5px; font-weight:700; color:var(--mint-ink); margin-left:3px}
+/* ── 바텀시트 (dialog) ── */
+dialog.sheet{position:fixed; inset:auto 0 0 0; margin:0 auto; width:100%; max-width:480px; max-height:85vh;
+  border:0; border-radius:20px 20px 0 0; padding:10px 18px calc(18px + env(safe-area-inset-bottom,0px));
+  background:#fff; color:var(--black); box-shadow:0 -8px 30px rgba(10,10,10,.12)}
+dialog.sheet::backdrop{background:rgba(10,10,10,.42)}
+dialog.sheet[open]{animation:sheetUp .32s cubic-bezier(.16,1,.3,1)}
+@keyframes sheetUp{from{transform:translateY(24px); opacity:.6}to{transform:none; opacity:1}}
+@media (prefers-reduced-motion:reduce){ dialog.sheet[open]{animation:none} }
+.sheet .grab{width:38px; height:4px; border-radius:4px; background:var(--gray-border); margin:0 auto 12px}
+.sheet h3{font-size:17px; font-weight:800; text-align:center; margin:0 0 14px; letter-spacing:-.3px}
+.sheet .opt{display:flex; align-items:center; gap:10px; width:100%; text-align:left; background:#fff;
+  border:1px solid var(--gray-border); border-radius:12px; padding:12px 14px; min-height:54px; margin-bottom:8px; font-size:15px; font-weight:700}
+.sheet .opt[aria-pressed=true]{border:2px solid var(--mint-ink); background:var(--mint-light); padding:11px 13px}
+.sheet .opt .today{font-size:12px; font-weight:700; color:var(--mint-ink); margin-left:auto}
+.sheet .opt[disabled]{cursor:not-allowed; background:var(--gray-light); color:var(--muted)}
+.sheet .opt .s{display:block; font-size:12.5px; font-weight:500; color:var(--muted)}
+.sheet .list-h{font-size:12.5px; font-weight:700; color:var(--muted); margin:16px 0 8px}
+.sheet .foot-btn{margin-top:14px}
 .marks{display:flex; justify-content:space-between; font-size:12px; color:var(--dark-gray)}
 .tempo-val{color:var(--mint-ink); font-weight:800}
 
-/* 판정 카드 */
+/* ── 판정 카드 ── */
 .verdict{margin-top:12px; border-radius:12px; padding:22px 18px 20px; text-align:center;
          border:1px solid var(--gray-border); background:#fff}
 .verdict .call{font-size:18px; font-weight:800; letter-spacing:-.3px}
@@ -108,11 +145,12 @@ details[open] > summary .chev{transform:rotate(180deg)}
 .verdict .hero.place{font-size:30px; letter-spacing:-.8px; line-height:1.25; margin-top:6px}
 .verdict .meta{font-size:13.5px; margin-top:10px; font-weight:500; font-variant-numeric:tabular-nums}
 .verdict .meta b{font-weight:800}
+.verdict .meta2{font-size:13px; margin-top:4px; font-weight:700}
 .verdict .basis{display:inline-block; margin-top:12px; font-size:12px; font-weight:700;
-         background:#fff; color:var(--amber-ink); border:1px solid rgba(245,158,11,.45);
-         border-radius:20px; padding:3px 10px}
+         background:#fff; color:var(--dark-gray); border:1px dashed #9ca3af; border-radius:20px; padding:3px 10px}
+/* 탈 수 있음 — 민트, 남은 시간이 줄수록 진해진다 */
 .verdict.go{background:var(--mint-light); border-color:rgba(62,207,178,.55)}
-.verdict.go .call,.verdict.go .dl-label{color:var(--mint-ink)}
+.verdict.go .call,.verdict.go .dl-label,.verdict.go .meta2{color:var(--mint-ink)}
 .verdict.go .meta{color:var(--dark-gray)}
 .verdict.go.u10{background:#CFF3EA; border:2px solid var(--mint-ink); padding:21px 17px 19px}
 .verdict.go.u5{background:var(--mint-ink); border:2px solid var(--mint-ink); padding:21px 17px 19px; color:#fff}
@@ -121,20 +159,26 @@ details[open] > summary .chev{transform:rotate(180deg)}
 .verdict.go.u1{animation:nudge .7s cubic-bezier(.16,1,.3,1) 1}
 @keyframes nudge{0%{transform:scale(1)}35%{transform:scale(1.025)}100%{transform:scale(1)}}
 @media (prefers-reduced-motion:reduce){ .verdict.go.u1{animation:none} }
-.verdict .meta2{font-size:13px; margin-top:4px; font-weight:700; color:var(--mint-ink)}
-.verdict.stop .meta2{color:var(--red-deep)}
-.verdict.stop{background:var(--red-light); border-color:rgba(220,38,38,.35)}
-.verdict.stop .call{color:var(--red-ink)}
-.verdict.stop .dl-label,.verdict.stop .meta{color:var(--red-deep)}
-.verdict.hold{background:var(--amber-light); border-color:rgba(245,158,11,.4)}
-.verdict.hold .call{color:var(--amber-ink)}
-.verdict.hold .dl-label,.verdict.hold .meta{color:var(--amber-deep)}
-.verdict.hold .hero.place{color:var(--amber-deep)}
-.verdict .partial{margin-top:14px; padding-top:12px; border-top:1px solid rgba(146,64,14,.2);
-         font-size:13.5px; color:var(--amber-deep)}
+/* 끊김 — 잉크 */
+.verdict.stop{background:var(--black); border-color:var(--black); color:#fff}
+.verdict.stop .call{color:#fff}
+.verdict.stop .dl-label,.verdict.stop .meta,.verdict.stop .meta2{color:var(--ink-soft)}
+.verdict.stop .basis{background:transparent; color:#fff; border-color:#6b7280}
+/* 모름 — 점선 회색 */
+.verdict.hold{background:#fff; border:1.5px dashed #9ca3af; padding:21.5px 17.5px 19.5px}
+.verdict.hold .call{color:var(--black)}
+.verdict.hold .dl-label,.verdict.hold .meta{color:var(--muted)}
+.verdict.hold .hero.place{color:var(--dark-gray)}
+.verdict .partial{margin-top:14px; padding-top:12px; border-top:1px solid var(--gray-border); font-size:13.5px; color:var(--dark-gray)}
 .verdict .partial b{font-weight:800; font-variant-numeric:tabular-nums}
 
-/* 시연 컨트롤 */
+/* ── 시연 컨트롤 ── */
+details.fold{border-radius:12px}
+details.fold > summary{list-style:none; cursor:pointer; display:flex; align-items:center; gap:10px; min-height:52px; padding:10px 14px}
+details.fold > summary::-webkit-details-marker{display:none}
+.chev{width:16px; height:16px; flex:0 0 auto; color:var(--muted); transition:transform .2s ease}
+details[open] > summary .chev{transform:rotate(180deg)}
+@media (prefers-reduced-motion:reduce){ .chev{transition:none} }
 .demo{margin-top:10px; background:#fff; border:1px dashed #cfd4da}
 .demo > summary{font-size:13.5px; font-weight:700; color:var(--dark-gray)}
 .demo .mode{margin-left:auto; font-size:12px; font-weight:700; color:var(--muted)}
@@ -145,7 +189,7 @@ details[open] > summary .chev{transform:rotate(180deg)}
 .demo .ff .faint{line-height:1.45}
 #play{min-width:118px}
 
-/* 구간 목록 */
+/* ── 구간 목록 ── */
 .leg{display:flex; gap:11px; align-items:flex-start; padding:12px 0; border-bottom:1px solid var(--gray-border)}
 .leg:last-child{border-bottom:0}
 .chip{flex:0 0 auto; min-width:50px; height:24px; padding:0 8px; border-radius:20px;
@@ -154,31 +198,25 @@ details[open] > summary .chev{transform:rotate(180deg)}
 .chip.walk{background:var(--gray-light); color:var(--muted); border:1px solid var(--gray-border)}
 .leg .nm{font-size:14px; font-weight:700; letter-spacing:-.2px}
 .leg .sub{display:block; font-size:12.5px; color:var(--muted); margin-top:1px}
-.nw{white-space:nowrap}
-.leg .rt.past .v{color:var(--muted); text-decoration:line-through; font-weight:500}
-.leg.fail .rt.past .v{color:var(--red-deep)}
 .leg .tags{display:flex; flex-wrap:wrap; gap:5px; margin-top:5px}
 .leg .rt{flex:0 0 auto; text-align:right}
 .leg .rt .k{display:block; font-size:11.5px; color:var(--muted); font-weight:700}
 .leg .rt .v{display:block; font-size:14.5px; font-weight:700; font-variant-numeric:tabular-nums}
-.leg.bind,.leg.fail,.leg.miss{margin-inline:-10px; padding-inline:10px; border-radius:10px; border-bottom-color:transparent}
-.leg.bind{background:var(--gray-light)}
-.leg.fail{background:var(--red-light)}
-.leg.fail .sub,.leg.fail .rt .k{color:var(--red-deep)}
-.leg.fail .rt .v{color:var(--red-ink)}
-.leg.miss{background:var(--amber-light)}
-.leg.miss .sub,.leg.miss .rt .k{color:var(--amber-deep)}
-.leg.miss .rt .v{color:var(--amber-ink)}
+.leg .rt.past .v{color:var(--muted); text-decoration:line-through; font-weight:500}
+.leg.key,.leg.fail,.leg.miss{margin-inline:-10px; padding-inline:10px; border-radius:10px; border-bottom-color:transparent}
+.leg.key{background:var(--mint-light)}
+.leg.fail{background:#fff; outline:2px solid var(--black); outline-offset:-2px}
+.leg.miss{background:#fff; outline:1.5px dashed #9ca3af; outline-offset:-1.5px}
+.leg.miss .rt .v{color:var(--dark-gray)}
 .tag{font-size:11.5px; font-weight:700; padding:1px 8px; border-radius:12px; white-space:nowrap; border:1px solid transparent}
-.tag.ink{background:#fff; color:var(--dark-gray); border-color:#d1d5db}
-.tag.red{background:#fff; color:var(--red-ink); border-color:rgba(220,38,38,.4)}
-.tag.amber{background:var(--amber-light); color:var(--amber-ink); border-color:rgba(245,158,11,.4)}
-.leg.miss .tag.amber{background:#fff}
+.tag.key{background:#fff; color:var(--mint-ink); border-color:rgba(17,112,95,.45)}
+.tag.cut{background:var(--black); color:#fff}
+.tag.bus{background:#fff; color:var(--dark-gray); border:1px dashed #9ca3af}
 
 .explain{border-top:1px solid var(--gray-border); margin-top:4px; padding-top:14px; font-size:13.5px; color:var(--dark-gray)}
 .explain .h{font-size:12.5px; font-weight:800; color:var(--black); margin-bottom:3px}
 .explain p + p{margin-top:6px}
-.explain .warn{color:var(--amber-ink)}
+.explain .warn{color:var(--black); font-weight:600}
 
 details.why{border-top:1px solid var(--gray-border); margin-top:14px}
 details.why > summary{list-style:none; cursor:pointer; display:flex; align-items:center; gap:6px;
@@ -201,42 +239,39 @@ td.n{font-variant-numeric:tabular-nums; white-space:nowrap; font-weight:500}
 <div class="shell">
   <header class="top">
     <h1 class="brand">라스트<span class="accent">레인</span></h1>
-    <span class="pill">v0.4</span>
+    <span class="pill">v0.5</span>
     <span class="spacer"></span>
     <span class="who">Team 04</span>
   </header>
 
-  <details class="fold setup" id="setup">
-    <summary>
-      <span class="grow">
-        <span class="sum-route" id="sumRoute"></span>
-        <span class="sum-meta" id="sumMeta"></span>
-      </span>
-      <span class="chg">변경</span>
-      <svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </summary>
-    <div class="body">
-      <div>
-        <label class="fld" for="route">귀가 경로</label>
-        <select id="route"></select>
-      </div>
-      <div role="group" aria-labelledby="dayLbl">
-        <span class="fld" id="dayLbl">요일</span>
-        <div class="seg" id="daySeg">
-          <button type="button" data-day="weekday" aria-pressed="true">평일<span class="today" hidden>오늘</span></button>
-          <button type="button" data-day="weekend" aria-pressed="false">토·일<span class="today" hidden>오늘</span></button>
-        </div>
-      </div>
-      <div>
-        <label class="fld" for="tempo">내 걸음 속도 · <span class="tempo-val" id="tempoNow">보통</span></label>
-        <input type="range" id="tempo" min="0" max="4" step="1" value="2" aria-valuetext="보통">
-        <div class="marks" aria-hidden="true"><span>많이 느림</span><span>느림</span><span>보통</span><span>조금 빠름</span><span>빠름</span></div>
-      </div>
-    </div>
-  </details>
+  <!-- 검색: 아직 도착지를 안 골랐거나 "변경"을 눌렀을 때 -->
+  <section class="where" id="where" aria-labelledby="whereH">
+    <h2 id="whereH">어디로 가세요?</h2>
+    <button type="button" class="from" id="fromBtn">
+      <svg class="ico" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 18s6-5.2 6-10A6 6 0 0 0 4 8c0 4.8 6 10 6 10z" stroke="currentColor" stroke-width="1.7"/><circle cx="10" cy="8" r="2.2" stroke="currentColor" stroke-width="1.7"/></svg><span class="k">출발</span><span class="v grow" id="fromTxt">현위치 설정</span><span class="go">설정</span>
+    </button>
+    <form class="search-row" id="qForm" role="search" autocomplete="off">
+      <label for="q" class="sr-only">도착지</label>
+      <input type="search" id="q" placeholder="도착역 (예: 수원역)" enterkeyhint="search">
+      <button type="submit" class="btn primary">막차 확인</button>
+    </form>
+    <div id="qOut"></div>
+  </section>
 
-  <section id="verdict" class="verdict" aria-label="판정"></section>
-  <p id="sr" class="sr-only" aria-live="polite"></p>
+  <!-- 결과: 도착지를 골랐을 때 -->
+  <div id="result" hidden>
+    <button type="button" class="qbar" id="qbar" aria-label="도착지 변경">
+      <svg class="ico" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="9" cy="9" r="5.5" stroke="currentColor" stroke-width="1.9"/><path d="M13.2 13.2L17 17" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+      <span class="grow"><span class="t" id="qDest"></span><span class="s" id="qFrom"></span></span>
+      <span class="chg">변경</span>
+    </button>
+    <div class="conds">
+      <button type="button" class="cond" id="dayChip" aria-haspopup="dialog"></button>
+      <button type="button" class="cond" id="tempoChip" aria-haspopup="dialog"></button>
+    </div>
+
+    <section id="verdict" class="verdict" aria-label="판정"></section>
+    <p id="sr" class="sr-only" aria-live="polite"></p>
 
   <details class="fold demo" id="demo">
     <summary>
@@ -279,6 +314,8 @@ td.n{font-variant-numeric:tabular-nums; white-space:nowrap; font-weight:500}
     </details>
   </div>
 
+  </div>
+
   <div class="note">
     <b>데이터 출처.</b> 경로·구간 소요시간·도보시간은 조원 사용자 조사(2026-10-23)에서 수집한
     지도 앱 실측값입니다. 막차 시각은 평일 11개 경로 전부, 토·일은 6개 경로만 확인돼 있습니다.
@@ -286,6 +323,36 @@ td.n{font-variant-numeric:tabular-nums; white-space:nowrap; font-weight:500}
   </div>
   <p class="foot">Team 04 · 혁신기업경영 캡스톤디자인 II</p>
 </div>
+
+<dialog class="sheet" id="fromSheet" aria-labelledby="fromH">
+  <div class="grab"></div>
+  <h3 id="fromH">출발지 설정</h3>
+  <button type="button" class="opt" disabled><svg class="ico" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 18s6-5.2 6-10A6 6 0 0 0 4 8c0 4.8 6 10 6 10z" stroke="currentColor" stroke-width="1.7"/><circle cx="10" cy="8" r="2.2" stroke="currentColor" stroke-width="1.7"/></svg><span class="grow">현재 위치 사용<span class="s">아직 지원하지 않아요. 아무 곳에서나 판정하려면 실시간 경로 탐색 API가 필요해요.</span></span></button>
+  <p class="list-h">조원이 직접 조사한 출발지</p>
+  <div id="fromList"></div>
+  <button type="button" class="btn block foot-btn" data-close>닫기</button>
+</dialog>
+
+<dialog class="sheet" id="daySheet" aria-labelledby="dayH">
+  <div class="grab"></div>
+  <h3 id="dayH">요일</h3>
+  <div id="daySeg">
+    <button type="button" class="opt" data-day="weekday" aria-pressed="true">평일<span class="today" hidden>오늘</span></button>
+    <button type="button" class="opt" data-day="weekend" aria-pressed="false">토·일<span class="today" hidden>오늘</span></button>
+  </div>
+  <p class="faint" style="margin-top:6px">토·일 막차는 11개 경로 중 6개만 확인돼 있어요. 나머지는 판정을 보류해요.</p>
+  <button type="button" class="btn primary block foot-btn" data-close>완료</button>
+</dialog>
+
+<dialog class="sheet" id="tempoSheet" aria-labelledby="tempoH">
+  <div class="grab"></div>
+  <h3 id="tempoH">내 걸음 속도</h3>
+  <label class="fld" for="tempo">지금 걸음 · <span class="tempo-val" id="tempoNow">보통</span></label>
+  <input type="range" id="tempo" min="0" max="4" step="1" value="2" aria-valuetext="보통">
+  <div class="marks" aria-hidden="true"><span>많이 느림</span><span>느림</span><span>보통</span><span>조금 빠름</span><span>빠름</span></div>
+  <p class="faint" style="margin-top:12px">지도 앱 도보 시간에 곱해요. 깁스를 했거나 짐이 많으면 "많이 느림"을 고르세요.</p>
+  <button type="button" class="btn primary block foot-btn" data-close>완료</button>
+</dialog>
 
 <script>
 /* ─────────── 노선 색 ─────────── */
@@ -446,7 +513,7 @@ const $ = s => document.querySelector(s);
 const store = { get(k){ try{ return localStorage.getItem("lt:"+k); }catch(e){ return null; } },
                 set(k,v){ try{ localStorage.setItem("lt:"+k, v); }catch(e){} } };
 let state = {
-  route: ROUTES.some(r=>r.id===store.get("route")) ? store.get("route") : "R01",
+  route: ROUTES.some(r=>r.id===store.get("route")) ? store.get("route") : null, searching:false,
   tempo: (()=>{ const t=+store.get("tempo"); return Number.isInteger(t)&&t>=0&&t<=4&&store.get("tempo")!==null ? t : 2; })(),
   day: liveDay(), dayAuto:true, live:true, nowS: liveNowS(), ff:null
 };
@@ -459,17 +526,24 @@ const remainText = s => { const h=Math.floor(s/3600), m=Math.floor(s/60)%60, ss=
 const nw = t => `<span class="nw">${t}</span>`;
 const FF_NOTE = "1초에 1분씩 흐르고, 마감 15초 전부터 실제 속도로 바뀝니다. 마감이 10분 넘게 남았으면 10분 전으로 건너뜁니다.";
 
+const CHEV = '<svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const esc = t => t.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
 function render(){
-  const r = ROUTES.find(x=>x.id===state.route);
+  const r = state.route ? ROUTES.find(x=>x.id===state.route) : null;
+  const searching = !r || state.searching;
+  $("#where").hidden = !searching; $("#result").hidden = searching;
+  if(searching) return {kind:null, rem:null};
   const mul = TEMPOS[state.tempo].m, day = state.day, legs = r.legs;
   const res = judge(legs, mul, day);
   const nowTxt = (state.live ? "지금 " : "시연 시각 ") + fmtS(state.nowS);
   const today = liveDay();
 
   /* 요약 줄 · 요일 표시 */
-  $("#sumRoute").textContent = `${r.from} → ${r.to}`;
-  $("#sumMeta").innerHTML = `${day==="weekday"?"평일":"토·일"} · 걸음 ${TEMPOS[state.tempo].k}`
-    + (day!==today ? ` · <span class="warn">오늘은 ${today==="weekday"?"평일":"토·일"}</span>` : "");
+  $("#qDest").textContent = r.to;
+  $("#qFrom").textContent = `${r.from}에서 출발 · 조원 실측 경로`;
+  $("#dayChip").innerHTML = `${day==="weekday"?"평일":"토·일"}${day===today?" · 오늘":` <span class="warn">오늘은 ${today==="weekday"?"평일":"토·일"}</span>`}${CHEV}`;
+  $("#tempoChip").innerHTML = `걸음 ${TEMPOS[state.tempo].k}${CHEV}`;
   document.querySelectorAll("#daySeg button").forEach(x=>{ x.querySelector(".today").hidden = x.dataset.day!==today; });
   $("#modeLbl").textContent = state.live ? "실시간" : `시연 중 · ${fmtS(state.nowS)}`;
   $("#modeLbl").classList.toggle("on", !state.live);
@@ -554,7 +628,7 @@ function render(){
   $("#legs").innerHTML = legs.map((lg,i)=>{
     const miss = res.missing.some(m=>m.i===i);
     const isFail = fail && fail.i===i;
-    const isBind = !res.hold && !isFail && res.bindAt===i;
+    const isKey = !res.hold && !isFail && res.bindAt===i;
     const walk = lg.mode==="walk";
     const d = walk ? walkOf(lg,mul) : lg.min;
     const raw = lastOf(lg,day);
@@ -564,9 +638,9 @@ function render(){
     const chip = walk ? `<span class="chip walk">도보</span>`
       : (bg => `<span class="chip" style="background:${bg};color:${inkOn(bg)}">${lg.name}</span>`)(LINE[lg.name] || "#6b7280");
     const tags = [
-      isFail ? `<span class="tag red">여기서 끊김</span>` : "",
-      isBind ? `<span class="tag ink">마감을 정하는 구간</span>` : "",
-      lg.uncertain ? `<span class="tag amber">버스 시간표 기준</span>` : ""
+      isFail ? `<span class="tag cut">여기서 끊김</span>` : "",
+      isKey ? `<span class="tag key">마감을 정하는 구간</span>` : "",
+      lg.uncertain ? `<span class="tag bus">버스 시간표 기준</span>` : ""
     ].join("");
     let rt="";
     if(miss) rt = `<span class="rt"><span class="k">막차</span><span class="v">미확인</span></span>`;
@@ -574,7 +648,7 @@ function render(){
       const past = kind==="stop" && res.req[i]*60 < state.nowS;
       rt = `<span class="rt ${past?"past":""}"><span class="k">${past?"지남":walk?"늦어도 출발":"늦어도 탑승"}</span><span class="v">${fmt(res.req[i])}</span></span>`;
     } else if(walk && !legs.slice(i+1).some(x=>x.mode!=="walk")) rt = `<span class="rt"><span class="k">도착까지</span><span class="v">${d}분</span></span>`;
-    return `<div class="leg ${isBind?"bind":""} ${isFail?"fail":""} ${miss?"miss":""}">
+    return `<div class="leg ${isKey?"key":""} ${isFail?"fail":""} ${miss?"miss":""}">
       ${chip}
       <span class="grow"><span class="nm">${lg.from} → ${lg.to}</span><span class="sub">${sub}</span>${tags?`<span class="tags">${tags}</span>`:""}</span>
       ${rt}</div>`;
@@ -615,10 +689,52 @@ function inkOn(hex){
 }
 
 /* ─────────── 입력 ─────────── */
-const routeSel=$("#route");
-routeSel.innerHTML = ROUTES.map(r=>`<option value="${r.id}">${r.from} → ${r.to}</option>`).join("");
-routeSel.value = state.route;
-routeSel.addEventListener("change", e => { state.route=e.target.value; store.set("route",state.route); render(); });
+/* 검색: 도착지 이름으로 조사된 경로를 찾는다. 없으면 없다고 말한다. */
+const qIn=$("#q"), qOut=$("#qOut");
+const norm = t => t.replace(/\s/g,"").replace(/역$/,"").toLowerCase();
+const destKeys = r => { const last=[...r.legs].reverse().find(l=>l.mode!=="walk");
+  return [r.to, last ? last.to : ""].filter(Boolean).map(norm); };
+const findRoutes = q => { const n=norm(q); if(!n) return [];
+  return ROUTES.filter(r=>destKeys(r).some(k=>k.includes(n) || n.includes(k))); };
+const sugChips = () => `<div class="chips">${ROUTES.map(r=>`<button type="button" class="sug" data-id="${r.id}">${esc(r.to)}</button>`).join("")}</div>`;
+function renderSearch(submitted){
+  const q=qIn.value.trim(), hits=findRoutes(q);
+  let h;
+  if(!q) h = `<div class="hint">데모에서 판정할 수 있는 도착지${sugChips()}</div>`;
+  else if(hits.length) h = `<div class="matches">${hits.map(r=>`<button type="button" class="match" data-id="${r.id}">
+      <span class="grow"><span class="t">${esc(r.to)}</span><span class="s">${esc(r.from)}에서 출발</span></span>${CHEV.replace('class="chev"','class="chev" style="transform:rotate(-90deg)"')}</button>`).join("")}</div>`;
+  else h = `<div class="empty"><p class="h">‘${esc(q)}’는 아직 막차 데이터가 없어요</p>
+      <p>지금은 조원이 직접 조사한 11개 경로만 판정할 수 있어요.</p></div>
+      <div class="hint">대신 이 도착지들은 판정할 수 있어요${sugChips()}</div>`;
+  if(state.route) h += `<button type="button" class="btn block" id="cancelSearch" style="margin-top:14px">취소</button>`;
+  qOut.innerHTML = h;
+}
+function pick(id){
+  state.route=id; store.set("route",id); state.searching=false; qIn.value="";
+  render(); renderSearch(); window.scrollTo({top:0});
+}
+qIn.addEventListener("input", ()=>renderSearch());
+$("#qForm").addEventListener("submit", e => { e.preventDefault();
+  const hits=findRoutes(qIn.value.trim()); if(hits.length===1) pick(hits[0].id); else renderSearch(true); });
+qOut.addEventListener("click", e => { const b=e.target.closest("[data-id]");
+  if(b) return pick(b.dataset.id);
+  if(e.target.closest("#cancelSearch")){ state.searching=false; render(); } });
+$("#qbar").addEventListener("click", () => { state.searching=true; render(); renderSearch(); qIn.focus(); });
+
+/* 바텀시트 */
+function openSheet(id){ const d=$(id); if(d.showModal) d.showModal(); else d.setAttribute("open",""); }
+document.querySelectorAll("dialog.sheet").forEach(d => {
+  d.addEventListener("click", e => { if(e.target===d || e.target.closest("[data-close]")) d.close(); });
+});
+$("#dayChip").addEventListener("click", ()=>openSheet("#daySheet"));
+$("#tempoChip").addEventListener("click", ()=>openSheet("#tempoSheet"));
+$("#fromBtn").addEventListener("click", () => {
+  $("#fromList").innerHTML = ROUTES.map(r=>`<button type="button" class="opt" data-id="${r.id}" aria-pressed="${r.id===state.route}">
+      <span class="grow">${esc(r.from)}<span class="s">→ ${esc(r.to)}</span></span></button>`).join("");
+  openSheet("#fromSheet");
+});
+$("#fromList").addEventListener("click", e => { const b=e.target.closest("[data-id]"); if(!b) return;
+  $("#fromSheet").close(); pick(b.dataset.id); });
 
 const tempoIn=$("#tempo");
 function syncTempo(){ const k=TEMPOS[state.tempo].k; tempoIn.value=state.tempo; $("#tempoNow").textContent=k; tempoIn.setAttribute("aria-valuetext",k); }
@@ -642,6 +758,7 @@ $("#liveBtn").addEventListener("click", goLive);
 
 function step(before){
   const r = ROUTES.find(x=>x.id===state.route);
+  if(!r){ stopFF(); return; }
   const res = judge(r.legs, TEMPOS[state.tempo].m, state.day);
   if(res.hold){ stopFF(); render(); return; }
   const rem = res.deadline*60 - state.nowS;
@@ -655,6 +772,7 @@ function step(before){
 playBtn.addEventListener("click", () => {
   if(state.ff){ stopFF(); return; }
   const r = ROUTES.find(x=>x.id===state.route);
+  if(!r) return;
   const res = judge(r.legs, TEMPOS[state.tempo].m, state.day);
   const rem = res.hold ? null : res.deadline*60 - state.nowS;
   if(rem==null || rem<0){
@@ -675,7 +793,7 @@ setInterval(() => { if(!state.live) return; state.nowS=liveNowS();
   if(state.dayAuto){ const d=liveDay(); if(d!==state.day){ state.day=d; syncDay(); } } render(); }, 1000);
 
 nowIn.value=fmt(Math.floor(state.nowS/60));
-syncTempo(); syncDay(); render();
+syncTempo(); syncDay(); render(); renderSearch();
 </script>
 </body>
 </html>
