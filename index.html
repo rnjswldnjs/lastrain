@@ -18,180 +18,245 @@
 /* 레이아웃: 폰 폭 한 칸. 색·라운드·버튼은 LibMatch 테마. */
 :root{
   --black:#0a0a0a; --white:#f7f7f5;
-  --mint:#3ECFB2; --mint-dark:#2BA891; --mint-light:#E8FAF6;
-  --gray:#6b7280; --gray-light:#f3f4f6; --gray-border:#e5e7eb; --dark-gray:#374151;
-  --amber:#F59E0B; --amber-light:#FEF3C7; --amber-ink:#B45309;
-  --red:#DC2626; --red-light:#FEE2E2;
+  --mint:#3ECFB2; --mint-dark:#2BA891; --mint-light:#E8FAF6; --mint-ink:#11705F;
+  --gray:#6b7280; --muted:#4b5563; --gray-light:#f3f4f6; --gray-border:#e5e7eb; --dark-gray:#374151;
+  --amber:#F59E0B; --amber-light:#FEF3C7; --amber-ink:#92400E; --amber-deep:#78350F;
+  --red:#DC2626; --red-light:#FEE2E2; --red-ink:#B91C1C; --red-deep:#7F1D1D;
   --sans:'Pretendard',-apple-system,BlinkMacSystemFont,system-ui,'Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',sans-serif;
   color-scheme:light;
 }
 *{box-sizing:border-box}
 body{background:var(--white); color:var(--black); font-family:var(--sans);
-     font-size:15px; line-height:1.55; margin:0; -webkit-font-smoothing:antialiased}
+     font-size:15px; line-height:1.55; margin:0; -webkit-font-smoothing:antialiased;
+     word-break:keep-all; overflow-wrap:anywhere; caret-color:var(--mint-dark)}
+::selection{background:var(--mint-light); color:var(--black)}
+p{margin:0}
 .shell{max-width:480px; margin:0 auto; padding-inline:16px; padding-block:0 40px}
+.sr-only{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
 
 .top{position:sticky; top:env(safe-area-inset-top,0px); z-index:20; background:var(--white);
      border-bottom:1px solid var(--gray-border); margin-inline:-16px; padding:14px 16px 12px;
      display:flex; align-items:center; gap:9px}
 .brand{font-size:19px; font-weight:800; letter-spacing:-.5px}
 .brand .accent{color:var(--mint)}
-.pill{font-size:11.5px; font-weight:700; border-radius:20px; padding:3px 11px;
-      background:var(--mint-light); color:var(--mint-dark); border:1px solid rgba(62,207,178,.4)}
+.pill{font-size:12px; font-weight:700; border-radius:20px; padding:3px 11px;
+      background:var(--mint-light); color:var(--mint-ink); border:1px solid rgba(62,207,178,.4)}
 .top .spacer{margin-left:auto}
-.top .who{font-size:12px; color:var(--gray); font-weight:500}
+.top .who{font-size:12px; color:var(--muted); font-weight:500}
 
 .card{background:#fff; border:1px solid var(--gray-border); border-radius:12px; padding:18px}
-h2.sec{font-size:13px; font-weight:700; color:var(--dark-gray); margin:26px 0 10px; letter-spacing:-.2px}
+h2.sec{font-size:13px; font-weight:700; color:var(--dark-gray); margin:28px 0 10px; letter-spacing:-.2px}
 .grow{flex:1; min-width:0}
-.row{display:flex; gap:10px; align-items:center}
-.wrap{flex-wrap:wrap}
-.faint{font-size:12.5px; color:var(--gray)}
+.faint{font-size:12.5px; color:var(--muted)}
 
-label.fld{display:block; font-size:12.5px; color:var(--gray); font-weight:700; margin-bottom:6px}
-select,input[type=time]{width:100%; min-width:0; background:#fff; color:var(--black);
+label.fld,.fld{display:block; font-size:12.5px; color:var(--dark-gray); font-weight:700; margin-bottom:6px}
+select,input[type=time]{width:100%; min-width:0; min-height:46px; background:#fff; color:var(--black);
   font-family:inherit; font-size:15px; font-weight:500;
   border:1px solid var(--gray-border); border-radius:10px; padding:11px 12px}
 select:focus,input:focus{border-color:var(--mint); outline:none}
 :focus-visible{outline:2px solid var(--mint-dark); outline-offset:2px}
-input[type=range]{width:100%; accent-color:var(--mint); margin:4px 0 0}
+input[type=range]{width:100%; height:36px; accent-color:var(--mint); margin:0; cursor:pointer}
 
 button{font-family:inherit; cursor:pointer}
-.btn{background:#fff; color:var(--dark-gray); border:1px solid var(--gray-border);
-     border-radius:10px; padding:11px 14px; font-size:13.5px; font-weight:700; white-space:nowrap;
+.btn{display:inline-flex; align-items:center; justify-content:center; gap:7px; min-height:46px;
+     background:#fff; color:var(--dark-gray); border:1px solid var(--gray-border);
+     border-radius:10px; padding:11px 14px; font-size:14px; font-weight:700; white-space:nowrap;
      transition:background .15s,border-color .15s}
 .btn:hover{background:var(--gray-light)}
+.btn svg{width:16px; height:16px; flex:0 0 auto}
 .btn.on{background:var(--mint); border-color:var(--mint); color:var(--black)}
+.btn.on:hover{background:var(--mint)}
+
+/* 접히는 패널 공통 (설정 · 시연) */
+details.fold{border-radius:12px}
+details.fold > summary{list-style:none; cursor:pointer; display:flex; align-items:center; gap:10px;
+  min-height:52px; padding:10px 14px}
+details.fold > summary::-webkit-details-marker{display:none}
+.chev{width:16px; height:16px; flex:0 0 auto; color:var(--muted); transition:transform .2s ease}
+details[open] > summary .chev{transform:rotate(180deg)}
+@media (prefers-reduced-motion:reduce){ .chev{transition:none} }
+
+.setup{margin-top:14px; background:linear-gradient(135deg,#f7f7f5 0%,#e8faf6 60%,#c8f0e8 100%);
+       border:1px solid rgba(62,207,178,.35)}
+.setup .sum-route{display:block; font-size:14.5px; font-weight:700; letter-spacing:-.2px;
+       white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.setup .sum-meta{display:block; font-size:12.5px; color:var(--dark-gray); margin-top:1px}
+.setup .chg{font-size:12.5px; font-weight:700; color:var(--mint-ink); flex:0 0 auto}
+.setup .body{padding:4px 14px 16px}
+.setup .body > div + div{margin-top:14px}
 
 /* 요일 세그먼트 */
 .seg{display:flex; background:var(--gray-light); border:1px solid var(--gray-border);
      border-radius:10px; padding:3px; gap:3px}
-.seg button{flex:1; border:0; background:none; border-radius:8px; padding:8px 4px;
-            font-size:13.5px; font-weight:700; color:var(--gray)}
+.seg button{flex:1; min-height:40px; border:0; background:none; border-radius:8px; padding:8px 4px;
+            font-size:14px; font-weight:700; color:var(--muted)}
 .seg button[aria-pressed=true]{background:#fff; color:var(--black); box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.marks{display:flex; justify-content:space-between; font-size:12px; color:var(--dark-gray)}
+.tempo-val{color:var(--mint-ink); font-weight:800}
 
-.inputs{background:linear-gradient(135deg,#f7f7f5 0%,#e8faf6 60%,#c8f0e8 100%);
-        border:1px solid rgba(62,207,178,.35); border-radius:12px; padding:18px; margin-top:16px}
-.tempo{margin-top:16px}
-.tempo .marks{display:flex; justify-content:space-between; font-size:11.5px; color:var(--gray); margin-top:4px}
-.tempo .val{color:var(--mint-dark); font-weight:700}
-
-.verdict{margin-top:12px; border-radius:12px; padding:22px 18px 18px; text-align:center;
+/* 판정 카드 */
+.verdict{margin-top:12px; border-radius:12px; padding:22px 18px 20px; text-align:center;
          border:1px solid var(--gray-border); background:#fff}
+.verdict .call{font-size:18px; font-weight:800; letter-spacing:-.3px}
+.verdict .dl-label{font-size:12.5px; font-weight:700; margin-top:16px}
+.verdict .hero{margin-top:2px; line-height:1.05; font-variant-numeric:tabular-nums; font-weight:800}
+.verdict .hero .num{font-size:58px; letter-spacing:-2px}
+.verdict .hero .u{font-size:21px; letter-spacing:-.3px; margin:0 8px 0 3px}
+.verdict .hero .u:last-child{margin-right:0}
+.verdict .hero.place{font-size:30px; letter-spacing:-.8px; line-height:1.25; margin-top:6px}
+.verdict .meta{font-size:13.5px; margin-top:10px; font-weight:500; font-variant-numeric:tabular-nums}
+.verdict .meta b{font-weight:800}
+.verdict .basis{display:inline-block; margin-top:12px; font-size:12px; font-weight:700;
+         background:#fff; color:var(--amber-ink); border:1px solid rgba(245,158,11,.45);
+         border-radius:20px; padding:3px 10px}
 .verdict.go{background:var(--mint-light); border-color:rgba(62,207,178,.55)}
+.verdict.go .call,.verdict.go .dl-label{color:var(--mint-ink)}
+.verdict.go .meta{color:var(--dark-gray)}
 .verdict.stop{background:var(--red-light); border-color:rgba(220,38,38,.35)}
+.verdict.stop .call{color:var(--red-ink)}
+.verdict.stop .dl-label,.verdict.stop .meta{color:var(--red-deep)}
 .verdict.hold{background:var(--amber-light); border-color:rgba(245,158,11,.4)}
-.verdict .call{font-size:17px; font-weight:800; letter-spacing:-.3px}
-.verdict.go .call{color:var(--mint-dark)}
-.verdict.stop .call{color:var(--red)}
 .verdict.hold .call{color:var(--amber-ink)}
-.dl-label{font-size:12px; font-weight:700; color:var(--gray); margin-top:16px}
-.deadline{font-size:clamp(50px,16vw,66px); font-weight:800; line-height:1.02;
-          letter-spacing:-2px; font-variant-numeric:tabular-nums; margin-top:2px}
-.verdict.hold .deadline{font-size:clamp(26px,8vw,34px); letter-spacing:-1px; color:var(--amber-ink)}
-.left{font-size:13.5px; color:var(--dark-gray); margin-top:7px; font-weight:500}
-.left b{font-weight:800; font-variant-numeric:tabular-nums}
-.bar{height:5px; border-radius:20px; background:rgba(255,255,255,.75); overflow:hidden; margin-top:16px}
-.bar i{display:block; height:100%; border-radius:20px; background:var(--mint-dark); transition:width .35s ease}
-.verdict.stop .bar i{background:var(--red)}
-@media (prefers-reduced-motion:reduce){ .bar i{transition:none} }
+.verdict.hold .dl-label,.verdict.hold .meta{color:var(--amber-deep)}
+.verdict.hold .hero.place{color:var(--amber-deep)}
+.verdict .partial{margin-top:14px; padding-top:12px; border-top:1px solid rgba(146,64,14,.2);
+         font-size:13.5px; color:var(--amber-deep)}
+.verdict .partial b{font-weight:800; font-variant-numeric:tabular-nums}
 
-.leg{display:flex; gap:11px; align-items:flex-start; padding:11px 0; border-bottom:1px solid var(--gray-border)}
-.leg:last-of-type{border-bottom:0}
-.chip{flex:0 0 auto; min-width:48px; max-width:72px; height:23px; padding:0 7px; border-radius:20px;
-      font-size:10.5px; font-weight:700; color:#fff; display:flex; align-items:center;
-      justify-content:center; overflow:hidden; white-space:nowrap}
-.chip.walk{background:var(--gray-light); color:var(--gray); border:1px solid var(--gray-border)}
-.leg .nm{font-size:13.5px; font-weight:700; letter-spacing:-.2px}
-.leg .sub{font-size:12px; color:var(--gray)}
+/* 시연 컨트롤 */
+.demo{margin-top:10px; background:#fff; border:1px dashed #cfd4da}
+.demo > summary{font-size:13.5px; font-weight:700; color:var(--dark-gray)}
+.demo .mode{margin-left:auto; font-size:12px; font-weight:700; color:var(--muted)}
+.demo .mode.on{color:var(--mint-ink)}
+.demo .body{padding:2px 14px 16px}
+.demo .row{display:flex; gap:10px; align-items:flex-end}
+.demo .ff{margin-top:12px; display:flex; align-items:center; gap:12px}
+.demo .ff .faint{line-height:1.45}
+
+/* 구간 목록 */
+.leg{display:flex; gap:11px; align-items:flex-start; padding:12px 0; border-bottom:1px solid var(--gray-border)}
+.leg:last-child{border-bottom:0}
+.chip{flex:0 0 auto; min-width:50px; height:24px; padding:0 8px; border-radius:20px;
+      font-size:11.5px; font-weight:700; color:#fff; display:flex; align-items:center;
+      justify-content:center; white-space:nowrap; margin-top:1px}
+.chip.walk{background:var(--gray-light); color:var(--muted); border:1px solid var(--gray-border)}
+.leg .nm{font-size:14px; font-weight:700; letter-spacing:-.2px}
+.leg .sub{display:block; font-size:12.5px; color:var(--muted); margin-top:1px}
+.leg .tags{display:flex; flex-wrap:wrap; gap:5px; margin-top:5px}
 .leg .rt{flex:0 0 auto; text-align:right}
-.leg .rt .k{font-size:10.5px; color:var(--gray); font-weight:700}
-.leg .rt .v{font-size:14px; font-weight:700; font-variant-numeric:tabular-nums}
-.leg.cut{background:var(--red-light); margin-inline:-10px; padding-inline:10px;
-         border-radius:10px; border-bottom-color:transparent}
-.leg.cut .rt .v{color:var(--red)}
-.leg.miss{background:var(--amber-light); margin-inline:-10px; padding-inline:10px;
-          border-radius:10px; border-bottom-color:transparent}
+.leg .rt .k{display:block; font-size:11.5px; color:var(--muted); font-weight:700}
+.leg .rt .v{display:block; font-size:14.5px; font-weight:700; font-variant-numeric:tabular-nums}
+.leg.bind,.leg.fail,.leg.miss{margin-inline:-10px; padding-inline:10px; border-radius:10px; border-bottom-color:transparent}
+.leg.bind{background:var(--gray-light)}
+.leg.fail{background:var(--red-light)}
+.leg.fail .sub,.leg.fail .rt .k{color:var(--red-deep)}
+.leg.fail .rt .v{color:var(--red-ink)}
+.leg.miss{background:var(--amber-light)}
+.leg.miss .sub,.leg.miss .rt .k{color:var(--amber-deep)}
 .leg.miss .rt .v{color:var(--amber-ink)}
-.tag{font-size:10.5px; font-weight:700; color:var(--amber-ink); background:var(--amber-light);
-     padding:2px 8px; border-radius:12px; white-space:nowrap; margin-left:6px}
+.tag{font-size:11.5px; font-weight:700; padding:1px 8px; border-radius:12px; white-space:nowrap; border:1px solid transparent}
+.tag.ink{background:#fff; color:var(--dark-gray); border-color:#d1d5db}
+.tag.red{background:#fff; color:var(--red-ink); border-color:rgba(220,38,38,.4)}
+.tag.amber{background:var(--amber-light); color:var(--amber-ink); border-color:rgba(245,158,11,.4)}
+.leg.miss .tag.amber{background:#fff}
 
-.cutbox{background:var(--red-light); border:1px solid rgba(220,38,38,.3);
-        border-radius:10px; padding:14px; margin-top:12px}
-.cutbox .h{font-size:12.5px; font-weight:800; color:var(--red); margin-bottom:6px}
-.cutbox .body{font-size:13px; color:var(--dark-gray)}
-.cutbox .why{font-size:12px; color:var(--gray); margin-top:4px}
-.holdbox{background:var(--amber-light); border:1px solid rgba(245,158,11,.35);
-         border-radius:10px; padding:14px; margin-top:12px; font-size:13px; color:#78350F}
-.holdbox .h{font-size:12.5px; font-weight:800; color:var(--amber-ink); margin-bottom:5px}
-.okbox{font-size:13px; color:var(--gray); padding:12px 0 2px}
+.explain{border-top:1px solid var(--gray-border); margin-top:4px; padding-top:14px; font-size:13.5px; color:var(--dark-gray)}
+.explain .h{font-size:12.5px; font-weight:800; color:var(--black); margin-bottom:3px}
+.explain p + p{margin-top:6px}
+.explain .warn{color:var(--amber-ink)}
 
-details{border-top:1px solid var(--gray-border); margin-top:14px; padding-top:12px}
-summary{cursor:pointer; font-size:13px; font-weight:700; color:var(--mint-dark); list-style:none}
-summary::-webkit-details-marker{display:none}
-summary::after{content:" ▾"}
-details[open] summary::after{content:" ▴"}
+details.why{border-top:1px solid var(--gray-border); margin-top:14px}
+details.why > summary{list-style:none; cursor:pointer; display:flex; align-items:center; gap:6px;
+  min-height:44px; font-size:13.5px; font-weight:700; color:var(--mint-ink)}
+details.why > summary::-webkit-details-marker{display:none}
+details.why .chev{color:var(--mint-ink)}
 
 table{width:100%; border-collapse:collapse; font-size:12.5px; margin-top:10px}
 th,td{text-align:left; padding:8px 6px; border-bottom:1px solid var(--gray-border)}
-th{font-size:11px; color:var(--gray); font-weight:700}
+th{font-size:11.5px; color:var(--muted); font-weight:700}
 td.n{font-variant-numeric:tabular-nums; white-space:nowrap; font-weight:500}
 
-.note{margin-top:22px; background:var(--amber-light); border:1px solid rgba(245,158,11,.35);
-      border-radius:10px; padding:13px 14px; font-size:12.5px; color:#78350F; line-height:1.6}
+.note{margin-top:22px; background:var(--gray-light); border:1px solid var(--gray-border);
+      border-radius:10px; padding:13px 14px; font-size:12.5px; color:var(--dark-gray); line-height:1.6}
 .note b{font-weight:800}
-.foot{margin-top:18px; font-size:11.5px; color:var(--gray); text-align:center}
+.foot{margin-top:18px; font-size:12px; color:var(--muted); text-align:center}
 </style>
 </head>
 <body>
 <div class="shell">
   <header class="top">
     <span class="brand">라스트<span class="accent">레인</span></span>
-    <span class="pill">v0.2</span>
+    <span class="pill">v0.3</span>
     <span class="spacer"></span>
     <span class="who">Team 04</span>
   </header>
 
-  <div class="inputs">
-    <div style="margin-bottom:12px">
-      <label class="fld" for="route">귀가 경로</label>
-      <select id="route"></select>
-      <div class="faint" id="why" style="margin-top:6px"></div>
-    </div>
-
-    <div style="margin-bottom:12px">
-      <label class="fld">요일</label>
-      <div class="seg" id="daySeg">
-        <button data-day="weekday" aria-pressed="true">평일</button>
-        <button data-day="weekend" aria-pressed="false">토·일</button>
+  <details class="fold setup" id="setup">
+    <summary>
+      <span class="grow">
+        <span class="sum-route" id="sumRoute"></span>
+        <span class="sum-meta" id="sumMeta"></span>
+      </span>
+      <span class="chg">변경</span>
+      <svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </summary>
+    <div class="body">
+      <div>
+        <label class="fld" for="route">귀가 경로</label>
+        <select id="route"></select>
+      </div>
+      <div role="group" aria-labelledby="dayLbl">
+        <span class="fld" id="dayLbl">요일</span>
+        <div class="seg" id="daySeg">
+          <button type="button" data-day="weekday" aria-pressed="true">평일</button>
+          <button type="button" data-day="weekend" aria-pressed="false">토·일</button>
+        </div>
+      </div>
+      <div>
+        <label class="fld" for="tempo">내 걸음 속도 · <span class="tempo-val" id="tempoNow">보통</span></label>
+        <input type="range" id="tempo" min="0" max="4" step="1" value="2" aria-valuetext="보통">
+        <div class="marks" aria-hidden="true"><span>많이 느림</span><span>보통</span><span>빠름</span></div>
       </div>
     </div>
+  </details>
 
-    <div class="row wrap" style="gap:12px">
-      <div class="grow">
-        <label class="fld" for="now">현재 시각</label>
-        <input type="time" id="now" value="23:10">
+  <section id="verdict" class="verdict" aria-label="판정"></section>
+  <p id="sr" class="sr-only" aria-live="polite"></p>
+
+  <details class="fold demo" id="demo">
+    <summary>
+      시연 컨트롤
+      <span class="mode" id="modeLbl">실시간</span>
+      <svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </summary>
+    <div class="body">
+      <div class="row">
+        <div class="grow">
+          <label class="fld" for="now">시각 직접 지정</label>
+          <input type="time" id="now" value="23:10">
+        </div>
+        <button type="button" class="btn" id="liveBtn">지금 시각으로</button>
       </div>
-      <div style="flex:0 0 auto; align-self:flex-end; text-align:center">
-        <button class="btn" id="play" title="1초에 1분씩 시간이 흐릅니다">⏩ 빨리 감기</button>
-        <div class="faint" style="font-size:11px; margin-top:3px">1초 = 1분</div>
+      <div class="ff">
+        <button type="button" class="btn" id="play" aria-pressed="false">
+          <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" id="playIco"><path d="M1.5 3.2v9.6L8 8 1.5 3.2zM8 3.2v9.6L14.5 8 8 3.2z"/></svg>
+          <span id="playTxt">빨리 감기</span>
+        </button>
+        <p class="faint">1초에 1분씩 흐르고,<br>마감 15초 전부터는 실제 속도로 바뀝니다.</p>
       </div>
     </div>
-
-    <div class="tempo">
-      <label class="fld" for="tempo">내 걸음 속도 — <span class="val" id="tempoNow">보통</span></label>
-      <input type="range" id="tempo" min="0" max="4" step="1" value="2">
-      <div class="marks"><span>많이 느림</span><span>보통</span><span>빠름</span></div>
-    </div>
-  </div>
-
-  <div id="verdict" class="verdict"></div>
+  </details>
 
   <h2 class="sec">구간별 연결</h2>
-  <div class="card" style="padding:4px 18px 16px">
+  <div class="card" style="padding:4px 18px 6px">
+    <p class="faint" id="dayNote" style="padding-top:10px" hidden></p>
     <div id="legs"></div>
-    <details>
-      <summary>왜 이 시각인가요</summary>
-      <p class="faint" style="margin:10px 0 0">
+    <div class="explain" id="explain"></div>
+    <details class="why">
+      <summary>왜 이 시각인가요
+        <svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </summary>
+      <p class="faint">
         도착지에서 거꾸로 올라오며 각 구간을 “늦어도 몇 시에 시작해야 하는가”로 바꿉니다.
         맨 앞까지 오면 그게 최종 출발 마감시각입니다.
       </p>
@@ -201,9 +266,8 @@ td.n{font-variant-numeric:tabular-nums; white-space:nowrap; font-weight:500}
 
   <div class="note">
     <b>데이터 출처.</b> 경로·구간 소요시간·도보시간은 조원 사용자 조사(2026-10-23)에서 수집한
-    지도 앱 실측값입니다. 막차 시각은 <b>평일만 11개 경로 전부</b> 확보했고,
-    <b>토·일은 R01~R06만</b> 조사돼 있습니다. 버스 구간은 시간표와 실제 운행이 크게 다를 수 있어
-    별도 표시했습니다.
+    지도 앱 실측값입니다. 막차 시각은 평일 11개 경로 전부, 토·일은 6개 경로만 확인돼 있습니다.
+    버스 구간은 시간표 기준이라 실제 운행과 다를 수 있어 따로 표시했습니다.
   </div>
   <p class="foot">Team 04 · 혁신기업경영 캡스톤디자인 II</p>
 </div>
@@ -224,52 +288,52 @@ const B = (name, from, to, min, wd, we) =>
 
 /* ─────────── 경로 11개 (조원 조사 + 캡처 실측) ─────────── */
 const ROUTES = [
- {id:"R01", why:"수도권 최대 통근·통학 축", from:"스타벅스 몬테소리점", to:"수원역", legs:[
+ {id:"R01", from:"스타벅스 몬테소리점", to:"수원역", legs:[
    W("도보","스타벅스 몬테소리점","강남역",5,"314m"),
    S("신분당선","강남","정자",17,"00:27","23:54","양재역 방면 · 5개역"),
    W("환승 도보","신분당선","수인분당선",3,"62m"),
    S("수인분당선","정자","수원",39,"23:38","23:27","미금역 방면 · 15개역"),
    W("도보","수원역","도착지",2,"110m")]},
 
- {id:"R02", why:"심야 모임 최상위 출발지 + 서북부 베드타운", from:"스타벅스 홍대공항철도역점", to:"대화역", legs:[
+ {id:"R02", from:"스타벅스 홍대공항철도역점", to:"대화역", legs:[
    W("도보","출발지","홍대입구역",5,"269m"),
    S("경의중앙선","홍대입구","대곡",21,"23:26","23:27","가좌역 방면 · 8개역"),
    W("환승 도보","경의중앙선","3호선",4,"139m"),
    S("3호선","대곡","대화",12,"00:28","23:47","백석역 방면 · 5개역")]},
 
- {id:"R03", why:"대학 도서관 출발 + 광역버스가 병목", from:"건국대 상허기념도서관", to:"평내호평역", legs:[
+ {id:"R03", from:"건국대 상허기념도서관", to:"평내호평역", legs:[
    W("도보","상허기념도서관","건대입구역",11,"660m"),
    S("2호선","건대입구","잠실",8,"00:46","23:44","구의역 방면 · 4개역"),
    W("환승 도보","잠실역","광역환승센터",5,"323m"),
    B("M2323","잠실광역환승센터","호평상업지구",35,"23:47","23:40"),
    W("도보","호평상업지구","평내호평역",4,"264m")]},
 
- {id:"R04", why:"도서관 출발 + 인천 도착, 버스만 2회", from:"연세대 중앙도서관", to:"부평역", legs:[
+ {id:"R04", from:"연세대 중앙도서관", to:"부평역", legs:[
    W("도보","중앙도서관","연세대학교앞",10,"710m"),
    B("7737","연세대학교앞","홍대입구역",8,"23:51","23:59"),
    W("환승 도보","정류장","정류장",3,"169m"),
    B("1400","홍대입구역","부평역",39,"23:48","23:30"),
    W("도보","부평역","도착지",9,"551m")]},
 
- {id:"R05", why:"대학로 심야 귀가 + 경기 북부 최대 도착지", from:"방송통신대 대학본부", to:"의정부역", legs:[
+ {id:"R05", from:"방송통신대 대학본부", to:"의정부역", legs:[
    W("도보","대학본부","혜화역",8,"491m"),
    S("4호선","혜화","창동",18,"00:40","23:40","한성대입구역 방면 · 8개역"),
    W("환승 도보","4호선","1호선",3,"50m"),
    S("1호선","창동","의정부",14,"00:10","00:12","방학역 방면 · 6개역")]},
 
- {id:"R06", why:"사당 환승 허브 + 신분당선 통학지", from:"KB국민은행 사당동센터", to:"수지구청역", legs:[
+ {id:"R06", from:"KB국민은행 사당동센터", to:"수지구청역", legs:[
    W("도보","출발지","사당역",6,"355m"),
    S("2호선","사당","강남",9,"00:45","23:46","방배역 방면 · 4개역"),
    W("환승 도보","2호선","신분당선",4,"178m"),
    S("신분당선","강남","수지구청",25,"00:03","23:30","양재역 방면 · 8개역")]},
 
- {id:"R07", why:"야근 1순위 업무지구 + 대안 빈약한 도착지", from:"IFC서울", to:"운양역", legs:[
+ {id:"R07", from:"IFC서울", to:"운양역", legs:[
    W("도보","Two IFC","여의도역",7,"417m"),
    S("9호선 급행","여의도","김포공항",19,"00:46",null,"당산역 방면 · 5개역"),
    W("환승 도보·대기","9호선","김포골드라인",6,"255m + 대기 3분"),
    S("김포골드라인","김포공항","운양",19,"00:29",null,"고촌역 방면 · 5개역")]},
 
- {id:"R08", why:"야근 잦은 직장 밀집지 + 최외곽 신도시, GTX 포함", from:"숭실대입구역", to:"동탄역", legs:[
+ {id:"R08", from:"숭실대입구역", to:"동탄역", legs:[
    S("7호선","숭실대입구","고속터미널",9,"00:16",null,"남성역 방면 · 4개역"),
    W("환승 도보","7호선","3호선",4,"110m"),
    S("3호선","고속터미널","수서",20,"00:40",null,"교대역 방면"),
@@ -277,7 +341,7 @@ const ROUTES = [
    S("GTX-A","수서","동탄",21,"00:39",null,"성남역 방면 · 3개역"),
    W("도보","동탄역","도착지",1,"62m")]},
 
- {id:"R09", why:"심야 상권 + 3개 노선 환승역 출발, 서북 최외곽", from:"동국대 중앙도서관", to:"운정역", legs:[
+ {id:"R09", from:"동국대 중앙도서관", to:"운정역", legs:[
    W("도보","중앙도서관","충무로역",13,"815m"),
    S("4호선","충무로","서울역",4,"00:09",null,"명동역 방면 · 3개역"),
    W("환승 도보·대기","4호선","GTX-A",12,"500m + 대기 5분"),
@@ -286,7 +350,7 @@ const ROUTES = [
    B("074","운정중앙역","운정역",17,null,null),
    W("도보","운정역","도착지",2,"93m")]},
 
- {id:"R10", why:"대학가 상권 + 한양대 ERICA 통학지", from:"서울대 관정도서관", to:"한대앞역", daytime:true, legs:[
+ {id:"R10", from:"서울대 관정도서관", to:"한대앞역", daytime:true, legs:[
    W("도보","관정도서관","농생대",7,"456m"),
    B("5511","농생대","서울대입구역",10,null,null),
    W("환승 도보","정류장","서울대입구역",4,"139m"),
@@ -294,7 +358,7 @@ const ROUTES = [
    W("환승 도보·대기","2호선","4호선",3,"111m + 대기 1분"),
    S("4호선","사당","한대앞",42,"00:20",null,"남태령역 방면 · 16개역")]},
 
- {id:"R11", why:"대조군 — 실제로는 전 구간 막차 탑승", from:"서울대 행정관", to:"범계역", legs:[
+ {id:"R11", from:"서울대 행정관", to:"범계역", legs:[
    W("도보","행정관","관악산역",19,"1.3km"),
    S("신림선","관악산","신림",5,"23:32",null,"서울대벤처타운역 방면 · 3개역"),
    W("환승 도보·대기","신림선","2호선",15,"389m + 대기 10분"),
@@ -307,21 +371,31 @@ const ROUTES = [
 const TEMPOS = [{k:"많이 느림 (깁스·짐)",m:1.8},{k:"느림",m:1.35},{k:"보통",m:1.0},
                 {k:"조금 빠름",m:.85},{k:"빠름",m:.75}];
 
-/* ─────────── 시각 유틸 ─────────── */
+/* ─────────── 시각 유틸 ───────────
+   하루는 04:00에 바뀐다고 본다(막차는 자정을 넘기므로 00:00~03:59는 전날 밤의 연장). */
+const pad = n => String(n).padStart(2,"0");
 const toMin = s => { const [h,m]=s.split(":").map(Number); return (h<4?h+24:h)*60+m; };
-const fmt = v => v==null ? "—" : `${String(Math.floor(v/60)%24).padStart(2,"0")}:${String(v%60).padStart(2,"0")}`;
+const fmt = v => v==null ? "—" : `${pad(Math.floor(v/60)%24)}:${pad(v%60)}`;
+const fmtS = s => `${pad(Math.floor(s/3600)%24)}:${pad(Math.floor(s/60)%60)}:${pad(s%60)}`;
 const walkOf = (l,mul) => Math.max(1, Math.round(l.min*mul));
 const lastOf = (l,day) => l.last ? l.last[day] : null;
+const station = l => l.mode==="sub" ? l.from+"역" : l.from;
+const stationTo = l => l.mode==="sub" ? l.to+"역" : l.to;
+function liveNowS(){ const d=new Date(); let h=d.getHours(); if(h<4) h+=24;
+  return h*3600 + d.getMinutes()*60 + d.getSeconds(); }
+function liveDay(){ const d=new Date(); if(d.getHours()<4) d.setDate(d.getDate()-1);
+  const w=d.getDay(); return (w===0||w===6) ? "weekend" : "weekday"; }
 
-/* ─────────── 역산 판정 ─────────── */
-function judge(route, nowMin, mul, day){
-  const legs=route.legs, n=legs.length;
-  const req=new Array(n).fill(null);
-  let cuts=[], missing=[], nxt=null;
+/* ─────────── 역산 판정 ───────────
+   req[i]  : i번째 구간을 늦어도 몇 시에 시작해야 하는가 (분)
+   bind[i] : 그 시각을 정한 구간(막차가 실제로 걸리는 구간)의 번호 */
+function judge(legs, mul, day){
+  const n=legs.length, req=new Array(n).fill(null), bind=new Array(n).fill(null);
+  let cuts=[], missing=[], nxt=null, nb=null;
   for(let i=n-1;i>=0;i--){
     const lg=legs[i];
     if(lg.mode==="walk"){
-      req[i] = nxt==null ? null : nxt - walkOf(lg,mul);
+      req[i] = nxt==null ? null : nxt - walkOf(lg,mul); bind[i]=nb;
     } else {
       const raw = lastOf(lg,day);
       if(!raw) missing.push({i, leg:lg});
@@ -329,117 +403,235 @@ function judge(route, nowMin, mul, day){
       const byNext = nxt==null ? null : nxt - lg.min;
       const c=[last,byNext].filter(v=>v!=null);
       req[i] = c.length ? Math.min(...c) : null;
-      if(last!=null && byNext!=null && byNext<last){
-        let cause=null;
-        for(let j=i+1;j<n;j++) if(legs[j].mode!=="walk" && lastOf(legs[j],day)){ cause=legs[j]; break; }
-        cuts.push({i, leg:lg, last, must:byNext, gap:last-byNext, cause});
-      }
+      if(last!=null && (byNext==null || last<=byNext)) bind[i]=i; else bind[i]=nb;
+      if(last!=null && byNext!=null && byNext<last) cuts.push({i, leg:lg, last, must:byNext, gap:last-byNext});
     }
-    nxt = req[i];
+    nxt=req[i]; nb=bind[i];
   }
-  const deadline = req[0];
-  const hold = missing.length>0;
-  return {req, cuts, missing, hold, deadline,
-          ok: !hold && deadline!=null && nowMin<=deadline,
-          margin: deadline==null ? null : deadline-nowMin};
+  missing.sort((a,b)=>a.i-b.i); cuts.sort((a,b)=>a.i-b.i);
+  return {req, bind, cuts, missing, hold:missing.length>0, deadline:req[0], bindAt:bind[0]};
 }
 
-/* ─────────── 렌더 ─────────── */
+/* 앞으로 따라가기 — 지금 나가면 어디서 끊기는가 (마감을 넘겼을 때만 사용) */
+function reach(legs, nowS, mul, day){
+  let t = nowS/60;
+  for(let i=0;i<legs.length;i++){
+    const lg=legs[i];
+    if(lg.mode==="walk"){ t += walkOf(lg,mul); continue; }
+    const raw=lastOf(lg,day);
+    if(!raw) return null;
+    if(t > toMin(raw)) return {i, leg:lg, first: !legs.slice(0,i).some(x=>x.mode!=="walk")};
+    t += lg.min;
+  }
+  return null;
+}
+
+/* ─────────── 상태 ─────────── */
 const $ = s => document.querySelector(s);
-let state = {route:"R01", now:toMin("23:10"), tempo:2, day:"weekday", timer:null};
+const store = { get(k){ try{ return localStorage.getItem("lt:"+k); }catch(e){ return null; } },
+                set(k,v){ try{ localStorage.setItem("lt:"+k, v); }catch(e){} } };
+let state = {
+  route: ROUTES.some(r=>r.id===store.get("route")) ? store.get("route") : "R01",
+  tempo: (()=>{ const t=+store.get("tempo"); return Number.isInteger(t)&&t>=0&&t<=4&&store.get("tempo")!==null ? t : 2; })(),
+  day: liveDay(), dayAuto:true, live:true, nowS: liveNowS(), ff:null
+};
+let lastKind=null, lastBucket=null;
+
+const remainHTML = s => { const m=Math.floor(s/60), ss=s%60;
+  return `<span class="num">${m}</span><span class="u">분</span><span class="num">${pad(ss)}</span><span class="u">초</span>`; };
+const remainText = s => { const h=Math.floor(s/3600), m=Math.floor(s/60)%60, ss=s%60;
+  return (h?`${h}시간 `:"") + `${m}분 ${pad(ss)}초`; };
 
 function render(){
   const r = ROUTES.find(x=>x.id===state.route);
-  const mul = TEMPOS[state.tempo].m, day = state.day;
-  const res = judge(r, state.now, mul, day);
+  const mul = TEMPOS[state.tempo].m, day = state.day, legs = r.legs;
+  const res = judge(legs, mul, day);
+  const nowTxt = (state.live ? "지금 " : "시연 시각 ") + fmtS(state.nowS);
 
-  $("#why").textContent = r.why + (r.daytime ? " · 소요시간은 주간 조회 기준" : "");
+  $("#sumRoute").textContent = `${r.from} → ${r.to}`;
+  $("#sumMeta").textContent = `${day==="weekday"?"평일":"토·일"} · 걸음 ${TEMPOS[state.tempo].k}`;
+  $("#modeLbl").textContent = state.live ? "실시간" : `시연 중 · ${fmtS(state.nowS)}`;
+  $("#modeLbl").classList.toggle("on", !state.live);
 
-  const v=$("#verdict");
-  v.className = "verdict " + (res.hold ? "hold" : res.ok ? "go" : "stop");
+  const bindLeg = res.bindAt!=null ? legs[res.bindAt] : null;
+  const busBasis = bindLeg && bindLeg.uncertain
+    ? `<span class="basis">버스 시간표 기준 · 실제와 다를 수 있음</span>` : "";
+
+  const v=$("#verdict"); let kind, fail=null, sr;
   if(res.hold){
-    const names = res.missing.map(m=>m.leg.name).join(", ");
+    kind="hold";
+    const first = res.missing[0].i;
+    const pre = legs.slice(0, first);
+    const known = pre.filter(l=>l.mode!=="walk");
+    let partial="";
+    if(known.length){
+      const pj = judge(pre, mul, day);
+      const rem = pj.deadline*60 - state.nowS;
+      partial = `<p class="partial">${stationTo(known[known.length-1])}까지는 <b>${fmt(pj.deadline)}</b>까지 나가면 갈 수 있어요`
+        + (rem>=0 && rem<=3*3600 ? ` · ${remainText(rem)} 남음` : rem<0 ? " · 이미 지났어요" : "") + `</p>`;
+    }
     v.innerHTML = `
-      <div class="call">아직 판정할 수 없어요</div>
-      <div class="dl-label">막차 시각이 확인되지 않은 구간</div>
-      <div class="deadline">${names}</div>
-      <div class="left">${day==="weekend" ? "토·일 막차 미조사" : "막차 미조사"} · 이 구간이 채워지면 바로 판정됩니다</div>`;
+      <p class="call">아직 판정할 수 없어요</p>
+      <p class="dl-label">막차 시각을 모르는 구간</p>
+      <p class="hero place">${res.missing.map(m=>m.leg.name+(m.leg.mode==="bus"?" 버스":"")).join(" · ")}</p>
+      <p class="meta">${day==="weekend"?"토·일 막차 미확인":"막차 미확인"} · ${nowTxt}</p>${partial}`;
+    sr = "판정 보류. 막차 시각을 모르는 구간이 있어요.";
   } else {
-    const span = res.deadline==null ? 0 : Math.max(0, Math.min(1,(res.margin??0)/30));
-    v.innerHTML = `
-      <div class="call">${res.ok ? "지금 나가면 탈 수 있어요" : "지금은 막차 연결이 어려워요"}</div>
-      <div class="dl-label">최종 출발 마감시각</div>
-      <div class="deadline">${fmt(res.deadline)}</div>
-      <div class="left">${res.ok
-          ? `여유 <b>${res.margin}분</b> · 현재 ${fmt(state.now)}`
-          : `마감이 <b>${Math.abs(res.margin)}분</b> 지났습니다 · 현재 ${fmt(state.now)}`}</div>
-      <div class="bar"><i style="width:${(res.ok?span:1)*100}%"></i></div>`;
+    const rem = res.deadline*60 - state.nowS;
+    if(rem > 3*3600){
+      kind="early";
+      v.innerHTML = `
+        <p class="call">오늘 밤 막차까지 여유 있어요</p>
+        <p class="dl-label">최종 출발 마감시각</p>
+        <p class="hero"><span class="num">${fmt(res.deadline)}</span></p>
+        <p class="meta"><b>${remainText(rem)}</b> 남음 · ${nowTxt}</p>${busBasis}`;
+      sr = `여유 있음. 마감 ${fmt(res.deadline)}.`;
+    } else if(rem >= 0){
+      kind="go";
+      v.innerHTML = `
+        <p class="call">${rem<=300 ? "지금 바로 나가야 해요" : "지금 나가면 탈 수 있어요"}</p>
+        <p class="dl-label">출발까지 남은 시간</p>
+        <p class="hero">${remainHTML(rem)}</p>
+        <p class="meta"><b>${fmt(res.deadline)}</b>까지 출발 · ${nowTxt}</p>${busBasis}`;
+      sr = `탈 수 있어요. 남은 시간 ${Math.floor(rem/60)}분.`;
+    } else {
+      kind="stop";
+      fail = reach(legs, state.nowS, mul, day);
+      const over = Math.ceil(-rem/60);
+      const overTxt = over<=60 ? `마감 ${fmt(res.deadline)} · ${over}분 지남` : `마감 ${fmt(res.deadline)} 지남`;
+      const head = !fail ? "" : fail.first
+        ? `<p class="dl-label">지금 나가면</p><p class="hero place">첫 구간부터 끊겨요</p>
+           <p class="meta">${fail.leg.name} ${station(fail.leg)} 막차 ${lastOf(fail.leg,day)}가 지났어요</p>`
+        : `<p class="dl-label">지금 나가면 여기까지는 갈 수 있어요</p><p class="hero place">${station(fail.leg)}</p>
+           <p class="meta">${fail.leg.name} 막차 ${lastOf(fail.leg,day)}에 못 닿아요</p>`;
+      v.innerHTML = `<p class="call">지금은 막차 연결이 어려워요</p>${head}
+        <p class="meta" style="margin-top:4px">${overTxt} · ${nowTxt}</p>${busBasis}`;
+      sr = fail && !fail.first ? `막차 연결이 어려워요. ${station(fail.leg)}까지는 갈 수 있어요.` : "막차 연결이 어려워요.";
+    }
   }
+  v.className = "verdict " + (kind==="early" ? "go" : kind);
 
-  $("#legs").innerHTML = r.legs.map((lg,i)=>{
-    const cut = res.cuts.find(c=>c.i===i);
-    const miss = res.missing.find(m=>m.i===i);
-    const dur = lg.mode==="walk" ? walkOf(lg,mul) : lg.min;
+  /* 스크린리더: 판정이 바뀔 때와 10·5·1분 지점에서만 읽어준다 */
+  const remS = res.hold ? null : res.deadline*60 - state.nowS;
+  const bucket = remS==null ? null : remS<0 ? -1 : remS<=60 ? 1 : remS<=300 ? 5 : remS<=600 ? 10 : 99;
+  if(kind!==lastKind || bucket!==lastBucket){ $("#sr").textContent = sr; lastKind=kind; lastBucket=bucket; }
+
+  /* 구간 목록 */
+  $("#dayNote").hidden = !r.daytime;
+  $("#dayNote").textContent = "이 경로의 구간 소요시간은 낮 시간 조회값입니다.";
+  $("#legs").innerHTML = legs.map((lg,i)=>{
+    const miss = res.missing.some(m=>m.i===i);
+    const isFail = fail && fail.i===i;
+    const isBind = !res.hold && !isFail && res.bindAt===i;
+    const d = lg.mode==="walk" ? walkOf(lg,mul) : lg.min;
     const raw = lastOf(lg,day);
-    const col = LINE[lg.name] || "#6b7280";
     const sub = lg.mode==="walk"
-      ? `${dur}분${lg.note?` · ${lg.note}`:""}`
-      : `${dur}분${lg.dir?` · ${lg.dir}`:""}${raw?` · 막차 ${raw}`:""}`;
-    return `<div class="leg ${cut?"cut":""} ${miss?"miss":""}">
-      <span class="chip ${lg.mode==="walk"?"walk":""}" ${lg.mode==="walk"?"":`style="background:${col}"`}>${lg.mode==="walk"?"도보":lg.name}</span>
-      <span class="grow">
-        <span class="nm">${lg.from} → ${lg.to}</span>${lg.uncertain?`<span class="tag">시간표 ±</span>`:""}<br>
-        <span class="sub">${sub}</span>
-      </span>
-      <span class="rt"><span class="k">${miss?"막차":"늦어도"}</span><br>
-        <span class="v">${miss?"미확인":fmt(res.req[i])}</span></span>
-    </div>`;
-  }).join("")
-  + (res.hold
-      ? `<div class="holdbox"><div class="h">막차 시각이 비어 있습니다</div>
-          ${res.missing.map(m=>`${m.leg.name} ${m.leg.from}→${m.leg.to}`).join("<br>")}
-          <div style="margin-top:6px">${day==="weekend"
-            ? "이 경로는 토·일 막차가 아직 조사되지 않았습니다. 평일로 바꾸면 판정됩니다."
-            : "해당 구간 막차가 조사되지 않아 전체 판정을 보류합니다."}</div></div>`
-      : res.cuts.length
-      ? `<div class="cutbox"><div class="h">끊기는 구간</div>${res.cuts.map(c=>`
-          <div class="body"><b>${c.leg.name} ${c.leg.from}→${c.leg.to}</b> — 막차는 ${fmt(c.last)}이지만
-          <b>${fmt(c.must)}</b>에 타야 합니다 (${c.gap}분 앞당김)</div>
-          ${c.cause?`<div class="why">↳ ${c.cause.name} ${c.cause.from}→${c.cause.to} 막차 ${lastOf(c.cause,day)}이 먼저 끊깁니다</div>`:""}`).join("")}</div>`
-      : `<div class="okbox">끊기는 구간 없음 — 모든 환승이 막차까지 연결됩니다.</div>`);
+      ? `${d}분${lg.note?` · ${lg.note}`:""}`
+      : `${d}분${lg.dir?` · ${lg.dir}`:""}${raw?` · 막차 ${raw}`:""}`;
+    let chip;
+    if(lg.mode==="walk") chip = `<span class="chip walk">도보</span>`;
+    else { const bg = LINE[lg.name] || "#6b7280";
+           chip = `<span class="chip" style="background:${bg};color:${inkOn(bg)}">${lg.name}</span>`; }
+    const tags = [
+      isFail ? `<span class="tag red">여기서 끊김</span>` : "",
+      isBind ? `<span class="tag ink">마감 결정</span>` : "",
+      lg.uncertain ? `<span class="tag amber">시간표 ±</span>` : ""
+    ].join("");
+    const rt = miss ? `<span class="rt"><span class="k">막차</span><span class="v">미확인</span></span>`
+             : res.req[i]==null ? "" : `<span class="rt"><span class="k">늦어도</span><span class="v">${fmt(res.req[i])}</span></span>`;
+    return `<div class="leg ${isBind?"bind":""} ${isFail?"fail":""} ${miss?"miss":""}">
+      ${chip}
+      <span class="grow"><span class="nm">${lg.from} → ${lg.to}</span><span class="sub">${sub}</span>${tags?`<span class="tags">${tags}</span>`:""}</span>
+      ${rt}</div>`;
+  }).join("");
+
+  /* 근거 설명 */
+  let ex;
+  if(res.hold){
+    ex = `<p class="h">막차 미확인</p>`
+      + res.missing.map(m=>`<p>${m.leg.name} ${m.leg.from} → ${m.leg.to}</p>`).join("")
+      + `<p class="warn">${day==="weekend"
+          ? "이 경로는 토·일 막차가 아직 확인되지 않았어요. 평일로 바꾸면 판정돼요."
+          : "이 구간 막차를 확인하지 못해 전체 판정을 보류해요."}</p>`;
+  } else {
+    ex = `<p class="h">마감을 정하는 구간</p>
+      <p>${bindLeg.name} ${bindLeg.from} → ${bindLeg.to} · 막차 ${lastOf(bindLeg,day)}</p>`
+      + (res.cuts.length
+          ? res.cuts.map(c=>`<p>그래서 ${c.leg.name} ${c.leg.from} → ${c.leg.to} 구간은 막차(${fmt(c.last)})보다 ${c.gap}분 이른 <b>${fmt(c.must)}</b>에 타야 이어져요.</p>`).join("")
+          : `<p>다른 구간은 각자 막차까지 여유가 있어요.</p>`)
+      + (bindLeg.uncertain ? `<p class="warn">버스 시간표 기준이에요. 조사한 5건에서 시간표와 실제 도착 예측이 −10~+92분 달랐어요.</p>` : "");
+  }
+  $("#explain").innerHTML = ex;
 
   $("#calc").innerHTML = `<tr><th>구간</th><th>소요</th><th>막차</th><th>늦어도 시작</th></tr>` +
-    r.legs.map((lg,i)=>`<tr>
+    legs.map((lg,i)=>`<tr>
       <td>${lg.mode==="walk"?"도보":lg.name}</td>
       <td class="n">${lg.mode==="walk"?walkOf(lg,mul):lg.min}분</td>
       <td class="n">${lastOf(lg,day) || (lg.mode==="walk"?"—":"미확인")}</td>
       <td class="n">${fmt(res.req[i])}</td></tr>`).join("");
+  return kind;
+}
+
+/* 노선색 위 글자색: 흰색·검정 중 대비가 높은 쪽 */
+function inkOn(hex){
+  const c=[1,3,5].map(i=>parseInt(hex.substr(i,2),16)/255).map(v=>v<=.03928?v/12.92:((v+.055)/1.055)**2.4);
+  const L=.2126*c[0]+.7152*c[1]+.0722*c[2];
+  return (1.05/(L+.05)) >= ((L+.05)/.05303) ? "#fff" : "#0a0a0a";
 }
 
 /* ─────────── 입력 ─────────── */
-$("#route").innerHTML = ROUTES.map(r=>`<option value="${r.id}">${r.id} · ${r.from} → ${r.to}</option>`).join("");
-$("#route").addEventListener("change", e => { state.route=e.target.value; render(); });
-$("#now").addEventListener("change", e => { if(e.target.value){ state.now=toMin(e.target.value); render(); } });
-$("#tempo").addEventListener("input", e => {
-  state.tempo = +e.target.value;
-  $("#tempoNow").textContent = TEMPOS[state.tempo].k;
-  render();
-});
+const routeSel=$("#route");
+routeSel.innerHTML = ROUTES.map(r=>`<option value="${r.id}">${r.from} → ${r.to}</option>`).join("");
+routeSel.value = state.route;
+routeSel.addEventListener("change", e => { state.route=e.target.value; store.set("route",state.route); render(); });
+
+const tempoIn=$("#tempo");
+function syncTempo(){ const k=TEMPOS[state.tempo].k; tempoIn.value=state.tempo; $("#tempoNow").textContent=k; tempoIn.setAttribute("aria-valuetext",k); }
+tempoIn.addEventListener("input", e => { state.tempo=+e.target.value; store.set("tempo",state.tempo); syncTempo(); render(); });
+
+function syncDay(){ document.querySelectorAll("#daySeg button").forEach(x=>x.setAttribute("aria-pressed", String(x.dataset.day===state.day))); }
 document.querySelectorAll("#daySeg button").forEach(b => b.addEventListener("click", () => {
-  document.querySelectorAll("#daySeg button").forEach(x=>x.setAttribute("aria-pressed","false"));
-  b.setAttribute("aria-pressed","true");
-  state.day = b.dataset.day; render();
+  state.day=b.dataset.day; state.dayAuto=false; syncDay(); render();
 }));
-$("#play").addEventListener("click", e => {
-  const b=e.currentTarget;
-  if(state.timer){ clearInterval(state.timer); state.timer=null; b.textContent="⏩ 빨리 감기"; b.classList.remove("on"); }
-  else {
-    b.textContent="❙❙ 멈춤"; b.classList.add("on");
-    state.timer = setInterval(()=>{ state.now+=1; $("#now").value=fmt(state.now); render(); }, 900);
-  }
+
+/* 시연: 시각 지정 · 빨리 감기 */
+const nowIn=$("#now"), playBtn=$("#play");
+function stopFF(){ if(state.ff){ clearTimeout(state.ff); state.ff=null; }
+  playBtn.classList.remove("on"); playBtn.setAttribute("aria-pressed","false"); $("#playTxt").textContent="빨리 감기";
+  $("#playIco").innerHTML='<path d="M1.5 3.2v9.6L8 8 1.5 3.2zM8 3.2v9.6L14.5 8 8 3.2z"/>'; }
+function goLive(){ stopFF(); state.live=true; state.nowS=liveNowS();
+  if(state.dayAuto){ state.day=liveDay(); syncDay(); } render(); }
+nowIn.addEventListener("change", e => { if(!e.target.value) return;
+  stopFF(); state.live=false; state.nowS=toMin(e.target.value)*60; render(); });
+$("#liveBtn").addEventListener("click", goLive);
+
+function step(){
+  const before = lastKind;
+  const r = ROUTES.find(x=>x.id===state.route);
+  const res = judge(r.legs, TEMPOS[state.tempo].m, state.day);
+  const rem = res.hold ? Infinity : res.deadline*60 - state.nowS;
+  const slow = rem>=0 && rem<=15;
+  state.nowS += slow ? 1 : 15;
+  nowIn.value = fmt(Math.floor(state.nowS/60));
+  const kind = render();
+  if((before==="go"||before==="early") && kind==="stop"){ stopFF(); return; }   // 끊기는 순간에서 멈춘다
+  state.ff = setTimeout(step, slow ? 1000 : 250);
+}
+playBtn.addEventListener("click", () => {
+  if(state.ff){ stopFF(); return; }
+  state.live=false;
+  playBtn.classList.add("on"); playBtn.setAttribute("aria-pressed","true"); $("#playTxt").textContent="멈춤";
+  $("#playIco").innerHTML='<path d="M3.5 2.5h3v11h-3zM9.5 2.5h3v11h-3z"/>';
+  step();
 });
 
-render();
+/* 실시간 시계 */
+setInterval(() => { if(!state.live) return; state.nowS=liveNowS();
+  if(document.activeElement!==nowIn) nowIn.value=fmt(Math.floor(state.nowS/60));
+  if(state.dayAuto){ const d=liveDay(); if(d!==state.day){ state.day=d; syncDay(); } } render(); }, 1000);
+
+nowIn.value=fmt(Math.floor(state.nowS/60));
+syncTempo(); syncDay(); render();
 </script>
 </body>
 </html>
