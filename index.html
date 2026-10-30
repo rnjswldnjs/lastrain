@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="description" content="심야 환승 귀갓길의 최종 출발 마감시각을 판정하는 프로토타입. 혁신기업경영 캡스톤디자인 II Team 04.">
-<meta name="theme-color" content="#f7f7f5">
+<meta name="theme-color" content="#15143a">
+<script>try{var t=localStorage.getItem("lt:theme");document.documentElement.dataset.theme=(t==="light"?"light":"dark")}catch(e){document.documentElement.dataset.theme="dark"}</script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <style>
   :root{ padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px) }
@@ -14,14 +15,16 @@
 </style>
 <title>라스트레인</title>
 <style>
-/* 레이아웃: 폰 폭 한 칸. 색·라운드·버튼은 LibMatch 테마.
-   의미색: 민트 = 탈 수 있음 · 잉크(검정) = 끊김 · 점선 회색 = 모름.
-   빨강·노랑·초록은 노선 고유색에만 쓴다(겹치면 노선과 경고가 헷갈림). */
+/* 레이아웃: 폰 폭 한 칸. 라운드·버튼 구조는 LibMatch, 기본 테마는 밤하늘 다크(v1.1).
+   의미색: 민트 = 탈 수 있음 · 마감 10분 전부터 빨강으로 물듦 · 연한 빨강 = 끊김 · 점선 회색 = 모름. */
 :root{
   --black:#0a0a0a; --white:#f7f7f5;
   --mint:#3ECFB2; --mint-dark:#2BA891; --mint-light:#E8FAF6; --mint-ink:#11705F;
   --gray:#6b7280; --muted:#4b5563; --gray-light:#f3f4f6; --gray-border:#e5e7eb; --dark-gray:#374151;
   --ink-soft:#d1d5db;
+  --surface:#fff; --surface-solid:#fff; --topbg:var(--white); --on-mint:#0a0a0a; --on-ink:#fff;
+  --red:#B91C1C; --red-deep:#7F1D1D; --red-bg:#FFF5F5; --red-line:#FCA5A5; --red-tag:#FEE2E2;
+  --key-line:rgba(17,112,95,.45);
   --sans:'Pretendard',-apple-system,BlinkMacSystemFont,system-ui,'Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',sans-serif;
   color-scheme:light;
 }
@@ -38,7 +41,7 @@ p{margin:0}
 .faint{font-size:12.5px; color:var(--muted)}
 .ico{width:18px; height:18px; flex:0 0 auto}
 
-.top{position:sticky; top:env(safe-area-inset-top,0px); z-index:20; background:var(--white);
+.top{position:sticky; top:env(safe-area-inset-top,0px); z-index:20; background:var(--topbg);
      border-bottom:1px solid var(--gray-border); margin-inline:-16px; padding:14px 16px 12px;
      display:flex; align-items:center; gap:9px}
 .brand{font-size:19px; font-weight:800; letter-spacing:-.5px; margin:0; line-height:1.3}
@@ -48,14 +51,15 @@ p{margin:0}
 .top .spacer{margin-left:auto}
 .top .who{font-size:12px; color:var(--muted); font-weight:500}
 
-.card{background:#fff; border:1px solid var(--gray-border); border-radius:12px; padding:18px}
+.card{background:var(--surface); border:1px solid var(--gray-border); border-radius:12px; padding:18px}
 h2.sec{font-size:13px; font-weight:700; color:var(--dark-gray); margin:28px 0 10px; letter-spacing:-.2px}
 
-input[type=time],input[type=search]{width:100%; min-width:0; min-height:46px; background:#fff; color:var(--black);
+input[type=time],input[type=search]{width:100%; min-width:0; min-height:46px; background:var(--surface); color:var(--black);
   font-family:inherit; font-size:16px; font-weight:500;
   border:1px solid var(--gray-border); border-radius:10px; padding:11px 12px}
 input[type=search]{-webkit-appearance:none; appearance:none}
 input[type=search]::-webkit-search-cancel-button{display:none}
+input::placeholder{color:var(--muted); opacity:1}
 input:focus{border-color:var(--mint-ink)}
 input:focus:not(:focus-visible){outline:none}
 :focus-visible{outline:2px solid var(--mint-ink); outline-offset:2px}
@@ -64,18 +68,18 @@ label.fld,.fld{display:block; font-size:12.5px; color:var(--dark-gray); font-wei
 
 button{font-family:inherit; cursor:pointer; color:inherit}
 .btn{display:inline-flex; align-items:center; justify-content:center; gap:7px; min-height:46px;
-     background:#fff; color:var(--dark-gray); border:1px solid var(--gray-border);
+     background:var(--surface); color:var(--dark-gray); border:1px solid var(--gray-border);
      border-radius:10px; padding:11px 14px; font-size:14px; font-weight:700; white-space:nowrap;
      transition:background .15s,border-color .15s}
 .btn:hover{background:var(--gray-light)}
 .btn svg{width:16px; height:16px; flex:0 0 auto}
-.btn.on{background:var(--mint); border-color:var(--mint); color:var(--black)}
-.btn.primary{background:var(--mint); border-color:var(--mint); color:var(--black)}
-.btn.primary:hover{background:var(--mint-ink); border-color:var(--mint-ink); color:#fff}
+.btn.on{background:var(--mint); border-color:var(--mint); color:var(--on-mint)}
+.btn.primary{background:var(--mint); border-color:var(--mint); color:var(--on-mint)}
+.btn.primary:hover{background:var(--mint-ink); border-color:var(--mint-ink); color:var(--on-ink)}
 .btn.block{width:100%}
 
 /* ── 검색 (LibMatch 검색행 구조) ── */
-.where{margin-top:16px; background:#fff; border:1px solid var(--gray-border); border-radius:14px; padding:18px 16px 16px}
+.where{margin-top:16px; background:var(--surface); border:1px solid var(--gray-border); border-radius:14px; padding:18px 16px 16px}
 .where h2{font-size:22px; font-weight:800; letter-spacing:-.6px; margin:0 0 14px}
 .from{display:flex; align-items:center; gap:10px; width:100%; min-height:48px; padding:8px 12px;
       background:var(--gray-light); border:1px solid var(--gray-border); border-radius:10px; text-align:left; margin-bottom:8px}
@@ -102,7 +106,7 @@ button{font-family:inherit; cursor:pointer; color:inherit}
 
 /* ── 조건 칩 ── */
 .conds{display:flex; gap:8px; margin-top:10px; flex-wrap:wrap}
-.cond{display:inline-flex; align-items:center; gap:6px; background:#fff; border:1px solid var(--gray-border);
+.cond{display:inline-flex; align-items:center; gap:6px; background:var(--surface); border:1px solid var(--gray-border);
       border-radius:20px; padding:8px 12px 8px 14px; min-height:40px; font-size:13.5px; font-weight:700; color:var(--black)}
 .cond .chev{width:14px; height:14px}
 .cond .warn{font-size:12px; font-weight:800; color:var(--black); background:var(--gray-light); border-radius:10px; padding:0 6px}
@@ -110,14 +114,14 @@ button{font-family:inherit; cursor:pointer; color:inherit}
 /* ── 바텀시트 (dialog) ── */
 dialog.sheet{position:fixed; inset:auto 0 0 0; margin:0 auto; width:100%; max-width:480px; max-height:85vh;
   border:0; border-radius:20px 20px 0 0; padding:10px 18px calc(18px + env(safe-area-inset-bottom,0px));
-  background:#fff; color:var(--black); box-shadow:0 -8px 30px rgba(10,10,10,.12)}
+  background:var(--surface-solid); color:var(--black); box-shadow:0 -8px 30px rgba(10,10,10,.12)}
 dialog.sheet::backdrop{background:rgba(10,10,10,.42)}
 dialog.sheet[open]{animation:sheetUp .32s cubic-bezier(.16,1,.3,1)}
 @keyframes sheetUp{from{transform:translateY(24px); opacity:.6}to{transform:none; opacity:1}}
 @media (prefers-reduced-motion:reduce){ dialog.sheet[open]{animation:none} }
 .sheet .grab{width:38px; height:4px; border-radius:4px; background:var(--gray-border); margin:0 auto 12px}
 .sheet h3{font-size:17px; font-weight:800; text-align:center; margin:0 0 14px; letter-spacing:-.3px}
-.sheet .opt{display:flex; align-items:center; gap:10px; width:100%; text-align:left; background:#fff;
+.sheet .opt{display:flex; align-items:center; gap:10px; width:100%; text-align:left; background:var(--surface);
   border:1px solid var(--gray-border); border-radius:12px; padding:12px 14px; min-height:54px; margin-bottom:8px; font-size:15px; font-weight:700}
 .sheet .opt[aria-pressed=true]{border:2px solid var(--mint-ink); background:var(--mint-light); padding:11px 13px}
 .sheet .opt .today{font-size:12px; font-weight:700; color:var(--mint-ink); margin-left:auto}
@@ -130,7 +134,7 @@ dialog.sheet[open]{animation:sheetUp .32s cubic-bezier(.16,1,.3,1)}
 
 /* ── 판정 카드 ── */
 .verdict{margin-top:12px; border-radius:12px; padding:22px 18px 20px; text-align:center;
-         border:1px solid var(--gray-border); background:#fff}
+         border:1px solid var(--gray-border); background:var(--surface)}
 .verdict .call{font-size:18px; font-weight:800; letter-spacing:-.3px}
 .verdict .dl-label{font-size:12.5px; font-weight:700; margin-top:16px}
 .verdict .hero{margin-top:2px; line-height:1.05; font-variant-numeric:tabular-nums; font-weight:800}
@@ -142,7 +146,7 @@ dialog.sheet[open]{animation:sheetUp .32s cubic-bezier(.16,1,.3,1)}
 .verdict .meta b{font-weight:800}
 .verdict .meta2{font-size:13px; margin-top:4px; font-weight:700}
 .verdict .basis{display:inline-block; margin-top:12px; font-size:12px; font-weight:700;
-         background:#fff; color:var(--dark-gray); border:1px dashed #9ca3af; border-radius:20px; padding:3px 10px}
+         background:var(--surface); color:var(--dark-gray); border:1px dashed #9ca3af; border-radius:20px; padding:3px 10px}
 /* 탈 수 있음 · 끊김 — 흰 바탕 + 천천히 도는 그라데이션 테두리.
    마감 10분 전부터 --heat(0→1)만큼 민트 → 빨강으로 물든다. */
 @property --ang{syntax:'<angle>'; inherits:false; initial-value:0deg}
@@ -156,16 +160,16 @@ dialog.sheet[open]{animation:sheetUp .32s cubic-bezier(.16,1,.3,1)}
   animation:spin 7s linear infinite}
 @keyframes spin{to{--ang:360deg}}
 @media (prefers-reduced-motion:reduce){ .glow{animation:none} }
-.verdict.go .call,.verdict.go .dl-label,.verdict.go .meta2{color:color-mix(in srgb, #11705F, #B91C1C calc(var(--heat)*100%))}
+.verdict.go .call,.verdict.go .dl-label,.verdict.go .meta2{color:color-mix(in srgb, var(--mint-ink), var(--red) calc(var(--heat)*100%))}
 .verdict.go .meta{color:var(--dark-gray)}
 .verdict.go.u1{animation:spin 2.5s linear infinite, nudge .7s cubic-bezier(.16,1,.3,1) 1}
 @keyframes nudge{0%{transform:scale(1)}35%{transform:scale(1.02)}100%{transform:scale(1)}}
 .verdict.stop{--heat:1}
-.verdict.stop .call{color:#B91C1C}
+.verdict.stop .call{color:var(--red)}
 .verdict.stop .dl-label,.verdict.stop .meta,.verdict.stop .meta2{color:var(--dark-gray)}
-.verdict.stop .hero{color:#7F1D1D}
+.verdict.stop .hero{color:var(--red-deep)}
 /* 모름 — 점선 회색 */
-.verdict.hold{background:#fff; border:1.5px dashed #9ca3af; padding:21.5px 17.5px 19.5px}
+.verdict.hold{background:var(--surface); border:1.5px dashed #9ca3af; padding:21.5px 17.5px 19.5px}
 .verdict.hold .call{color:var(--black)}
 .verdict.hold .dl-label,.verdict.hold .meta{color:var(--muted)}
 .verdict.hold .hero.place{color:var(--dark-gray)}
@@ -179,7 +183,7 @@ details.fold > summary::-webkit-details-marker{display:none}
 .chev{width:16px; height:16px; flex:0 0 auto; color:var(--muted); transition:transform .2s ease}
 details[open] > summary .chev{transform:rotate(180deg)}
 @media (prefers-reduced-motion:reduce){ .chev{transition:none} }
-.demo{margin-top:10px; background:#fff; border:1px dashed #cfd4da}
+.demo{margin-top:10px; background:var(--surface); border:1px dashed #cfd4da}
 .demo > summary{font-size:13.5px; font-weight:700; color:var(--dark-gray)}
 .demo .mode{margin-left:auto; font-size:12px; font-weight:700; color:var(--muted)}
 .demo .mode.on{color:var(--mint-ink)}
@@ -205,13 +209,13 @@ details[open] > summary .chev{transform:rotate(180deg)}
 .leg .rt.past .v{color:var(--muted); text-decoration:line-through; font-weight:500}
 .leg.key,.leg.fail,.leg.miss{padding-right:10px; border-radius:10px; border-bottom-color:transparent}
 .leg.key{background:var(--mint-light)}
-.leg.fail{background:#FFF5F5; outline:1.5px solid #FCA5A5; outline-offset:-1.5px}
-.leg.miss{background:#fff; outline:1.5px dashed #9ca3af; outline-offset:-1.5px}
+.leg.fail{background:var(--red-bg); outline:1.5px solid var(--red-line); outline-offset:-1.5px}
+.leg.miss{background:var(--surface); outline:1.5px dashed #9ca3af; outline-offset:-1.5px}
 .leg.miss .rt .v{color:var(--dark-gray)}
 .tag{font-size:11.5px; font-weight:700; padding:1px 8px; border-radius:12px; white-space:nowrap; border:1px solid transparent}
-.tag.key{background:#fff; color:var(--mint-ink); border-color:rgba(17,112,95,.45)}
-.tag.cut{background:#FEE2E2; color:#B91C1C}
-.tag.bus{background:#fff; color:var(--dark-gray); border:1px dashed #9ca3af}
+.tag.key{background:var(--surface); color:var(--mint-ink); border-color:var(--key-line)}
+.tag.cut{background:var(--red-tag); color:var(--red)}
+.tag.bus{background:var(--surface); color:var(--dark-gray); border:1px dashed #9ca3af}
 
 .explain{border-top:1px solid var(--gray-border); margin-top:4px; padding-top:14px; font-size:13.5px; color:var(--dark-gray)}
 .explain .h{font-size:12.5px; font-weight:800; color:var(--black); margin-bottom:3px}
@@ -235,9 +239,9 @@ td.n{font-variant-numeric:tabular-nums; white-space:nowrap; font-weight:500}
 .foot{margin-top:18px; font-size:12px; color:var(--muted); text-align:center}
 
 /* ── v0.6 홈 (셔클식 출발/도착 묶음) ── */
-.od{border:1.5px solid var(--gray-border); box-shadow:0 2px 10px rgba(10,10,10,.04); border-radius:12px; overflow:hidden; background:#fff}
+.od{border:1.5px solid var(--gray-border); box-shadow:0 2px 10px rgba(10,10,10,.04); border-radius:12px; overflow:hidden; background:var(--surface)}
 .od-row{display:flex; align-items:center; gap:10px; width:100%; min-height:54px; padding:8px 12px;
-        background:#fff; border:0; text-align:left; margin:0}
+        background:var(--surface); border:0; text-align:left; margin:0}
 .od-row + .od-row{border-top:1px solid var(--gray-border)}
 .od-row .k{font-size:12.5px; font-weight:700; color:var(--muted); flex:0 0 auto; margin:0}
 .od-row .v{font-size:15px; font-weight:700}
@@ -256,7 +260,7 @@ td.n{font-variant-numeric:tabular-nums; white-space:nowrap; font-weight:500}
         border-bottom:1px solid var(--gray-border); padding:12px 2px; min-height:52px; margin-top:6px}
 .recent .t{font-size:14.5px; font-weight:700}
 .recent .s{display:block; font-size:12.5px; color:var(--muted)}
-.conds-card{margin-top:12px; background:#fff; border:1px solid var(--gray-border); border-radius:14px; padding:4px 0}
+.conds-card{margin-top:12px; background:var(--surface); border:1px solid var(--gray-border); border-radius:14px; padding:4px 0}
 .row-btn{display:flex; align-items:center; gap:12px; width:100%; text-align:left; background:none; border:0;
          padding:12px 16px; min-height:60px}
 .row-btn + .row-btn{border-top:1px solid var(--gray-border)}
@@ -270,14 +274,14 @@ td.n{font-variant-numeric:tabular-nums; white-space:nowrap; font-weight:500}
 /* 날짜·시간 시트 */
 .days{display:flex; gap:6px; overflow-x:auto; padding-bottom:4px; scrollbar-width:none}
 .days::-webkit-scrollbar{display:none}
-.day{flex:0 0 auto; min-width:62px; min-height:58px; background:#fff; border:1px solid var(--gray-border); border-radius:12px;
+.day{flex:0 0 auto; min-width:62px; min-height:58px; background:var(--surface); border:1px solid var(--gray-border); border-radius:12px;
      padding:6px 8px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px}
 .day .d1{font-size:12px; font-weight:700; color:var(--muted)}
 .day .d2{font-size:15px; font-weight:800; font-variant-numeric:tabular-nums}
 .day[aria-pressed=true]{border:2px solid var(--mint-ink); background:var(--mint-light)}
 .day[aria-pressed=true] .d1{color:var(--mint-ink)}
 .seg2{display:flex; gap:8px}
-.seg2 button{flex:1; min-height:46px; background:#fff; border:1px solid var(--gray-border); border-radius:10px; font-size:14.5px; font-weight:700}
+.seg2 button{flex:1; min-height:46px; background:var(--surface); border:1px solid var(--gray-border); border-radius:10px; font-size:14.5px; font-weight:700}
 .seg2 button[aria-pressed=true]{border:2px solid var(--mint-ink); background:var(--mint-light)}
 .seg2 button[disabled]{background:var(--gray-light); color:var(--muted); cursor:not-allowed}
 .basis-note{margin-top:12px; font-size:13px; color:var(--dark-gray); background:var(--gray-light); border-radius:10px; padding:10px 12px}
@@ -286,7 +290,8 @@ td.n{font-variant-numeric:tabular-nums; white-space:nowrap; font-weight:500}
 /* 로딩 */
 .loading{margin-top:40px; text-align:center; padding:28px 16px}
 .runner{width:170px; height:auto; display:block; margin:0 auto}
-.runner .limb path,.runner .torso{fill:none; stroke:#11705F; stroke-width:5.5; stroke-linecap:round; stroke-linejoin:round}
+.runner .head{fill:var(--mint-ink)}
+.runner .limb path,.runner .torso{fill:none; stroke:var(--mint-ink); stroke-width:5.5; stroke-linecap:round; stroke-linejoin:round}
 .runner .leg,.runner .arm{transform-box:view-box}
 .runner .leg{transform-origin:64px 50px}
 .runner .arm{transform-origin:68px 33px}
@@ -300,21 +305,21 @@ td.n{font-variant-numeric:tabular-nums; white-space:nowrap; font-weight:500}
 @keyframes dash{to{stroke-dashoffset:22}}
 @media (prefers-reduced-motion:reduce){ .runner *{animation:none !important} }
 .ld-h{font-size:18px; font-weight:800; letter-spacing:-.3px; margin-top:18px}
-.tip{margin:18px auto 0; max-width:340px; background:#fff; border:1px solid var(--gray-border); border-radius:12px;
+.tip{margin:18px auto 0; max-width:340px; background:var(--surface); border:1px solid var(--gray-border); border-radius:12px;
      padding:12px 14px; font-size:13.5px; color:var(--dark-gray); text-align:left; display:flex; gap:10px}
 .tip b{flex:0 0 auto; font-size:11.5px; font-weight:800; color:var(--mint-ink); background:var(--mint-light); border-radius:6px; padding:2px 6px; height:fit-content}
 
 /* 결과 상단 */
 .rbar{display:flex; align-items:center; gap:8px; margin-top:12px}
-.rbar .back{width:44px; height:44px; border-radius:10px; border:1px solid var(--gray-border); background:#fff; display:grid; place-items:center; flex:0 0 auto}
+.rbar .back{width:44px; height:44px; border-radius:10px; border:1px solid var(--gray-border); background:var(--surface); display:grid; place-items:center; flex:0 0 auto}
 .rbar .t{font-size:19px; font-weight:800; letter-spacing:-.4px; margin:0; line-height:1.3}
 .rbar .t:focus{outline:none}
 .rbar .s{font-size:12.5px; color:var(--muted)}
 .cond.static{border-style:dashed; color:var(--dark-gray); font-weight:600; cursor:default}
 .ffbtn{display:inline-flex; align-items:center; gap:6px; min-height:44px; padding:0 12px; border-radius:10px;
-       border:1px solid var(--gray-border); background:#fff; font-size:13px; font-weight:700; flex:0 0 auto}
+       border:1px solid var(--gray-border); background:var(--surface); font-size:13px; font-weight:700; flex:0 0 auto}
 .ffbtn svg{width:14px; height:14px}
-.ffbtn[aria-pressed=true]{background:var(--mint); border-color:var(--mint)}
+.ffbtn[aria-pressed=true]{background:var(--mint); border-color:var(--mint); color:var(--on-mint)}
 .toast{margin-top:8px; font-size:12.5px; color:var(--dark-gray); background:var(--gray-light); border-radius:10px; padding:8px 12px}
 .list-h2{font-size:12.5px; font-weight:700; color:var(--muted); margin:14px 2px 2px}
 .match .pin{color:var(--muted)}
@@ -330,11 +335,12 @@ td.n{font-variant-numeric:tabular-nums; white-space:nowrap; font-weight:500}
 @keyframes pop{0%{transform:scale(.97)}60%{transform:scale(1.015)}100%{transform:scale(1)}}
 @media (prefers-reduced-motion:reduce){ .trip .ck circle,.trip .ck path{animation:none; stroke-dashoffset:0} .trip.done{animation:none} }
 .trip-btn{margin-top:10px; min-height:52px}
-.trip-btn.off{background:#fff; border-color:var(--gray-border); color:var(--dark-gray)}
+.trip-btn.off{background:var(--surface); border-color:var(--gray-border); color:var(--dark-gray)}
 .leg.now{padding-right:10px; border-bottom-color:transparent}
-.tag.now{background:var(--mint-ink); color:#fff}
+.tag.now{background:var(--mint-ink); color:var(--on-ink)}
 .leg .eta{display:block; font-size:12.5px; font-weight:700; color:var(--mint-ink); margin-top:2px; font-variant-numeric:tabular-nums}
-.leg .eta.late{color:var(--black)}
+.leg .eta.late{color:var(--red)}
+.leg .eta.late b{font-weight:800}
 .rtbtn{flex:0 0 auto; text-align:right; background:none; border:0; padding:4px 0 4px 8px; min-height:44px; min-width:76px}
 .rtbtn .k{display:block; font-size:11.5px; color:var(--muted); font-weight:700}
 .rtbtn .v{display:block; font-size:14.5px; font-weight:800; font-variant-numeric:tabular-nums}
@@ -350,7 +356,7 @@ td.n{font-variant-numeric:tabular-nums; white-space:nowrap; font-weight:500}
 .leg .rail::before{content:""; position:absolute; left:0; top:21px; bottom:-21px; width:6px; border-radius:3px; background:var(--lc)}
 .leg .rail.walk::before{background:repeating-linear-gradient(var(--lc) 0 6px, transparent 6px 11px)}
 .leg .rail.end::before{display:none}
-.leg .rail i{position:absolute; left:-4px; top:14px; width:14px; height:14px; border-radius:50%; background:#fff; border:2.5px solid #9ca3af; z-index:1}
+.leg .rail i{position:absolute; left:-4px; top:14px; width:14px; height:14px; border-radius:50%; background:var(--surface-solid); border:2.5px solid #9ca3af; z-index:1}
 .leg.passed .rail i{background:var(--mint-ink); border-color:var(--mint-ink)}
 .leg.passed .nm{color:var(--muted)}
 .leg.end{padding-top:12px; padding-bottom:6px}
@@ -358,32 +364,105 @@ td.n{font-variant-numeric:tabular-nums; white-space:nowrap; font-weight:500}
 .lchip{display:inline-block; font-size:11px; font-weight:800; border-radius:10px; padding:1px 7px; margin-right:6px; vertical-align:2px}
 .leg .live{color:var(--mint-ink); font-weight:800; font-variant-numeric:tabular-nums}
 .leg.now{background:var(--mint-light); border-radius:10px; outline:none}
-.mk{position:absolute; left:-6px; top:-17px; width:34px; height:34px; border-radius:50%; background:#fff; color:var(--mint-ink);
-    border:2px solid var(--mint-ink); display:grid; place-items:center; z-index:3; box-shadow:0 4px 12px rgba(17,112,95,.25);
+.mk{position:absolute; left:-6px; top:-17px; width:34px; height:34px; border-radius:50%; background:var(--surface-solid); color:var(--mint-ink);
+    border:2px solid var(--mint-ink); display:grid; place-items:center; z-index:3; box-shadow:0 4px 12px rgba(10,10,10,.18);
     transition:transform .3s linear}
 .mk svg{width:18px; height:18px}
 @media (prefers-reduced-motion:reduce){ .mk{transition:none} }
 .toastx{position:fixed; left:50%; bottom:calc(18px + env(safe-area-inset-bottom,0px)); transform:translateX(-50%); z-index:50;
-        width:calc(100% - 32px); max-width:448px; background:#fff; color:var(--black); border:1.5px solid var(--mint); border-radius:14px; padding:14px 16px;
+        width:calc(100% - 32px); max-width:448px; background:var(--surface-solid); color:var(--black); border:1.5px solid var(--mint); border-radius:14px; padding:14px 16px;
         font-size:15px; font-weight:800; box-shadow:0 10px 30px rgba(10,10,10,.3); animation:toastUp .35s cubic-bezier(.16,1,.3,1)}
 .toastx small{display:block; font-size:12.5px; font-weight:600; color:var(--muted); margin-top:2px}
 @keyframes toastUp{from{transform:translate(-50%,16px); opacity:0}to{transform:translate(-50%,0); opacity:1}}
 @media (prefers-reduced-motion:reduce){ .toastx{animation:none} }
+
+/* ── v1.1 추가 ── */
+.leg .lnote{display:block; font-size:11.5px; color:var(--muted); margin-top:1px}
+.leg .cutnote{display:flex; gap:5px; align-items:flex-start; font-size:12px; font-weight:600; color:var(--dark-gray); margin-top:4px}
+.leg .cutnote svg{width:14px; height:14px; flex:0 0 auto; margin-top:2px; color:var(--muted)}
+.verdict .why1{margin-top:14px; padding-top:12px; border-top:1px solid var(--gray-border); font-size:13px; color:var(--dark-gray); font-weight:600}
+.verdict .warn2{display:inline-block; margin-top:10px; font-size:12.5px; font-weight:800; color:var(--red);
+  border:1px solid var(--red-line); border-radius:20px; padding:3px 10px}
+.verdict .alt{margin-top:14px; padding:12px 14px; border-radius:10px; background:var(--gray-light); text-align:left; font-size:14px; color:var(--black)}
+.verdict .alt b{font-weight:800; font-variant-numeric:tabular-nums}
+.verdict .alt small{display:block; font-size:12px; color:var(--muted); margin-top:3px; line-height:1.5}
+.whybox{margin-top:10px; padding:0 16px 6px; border-radius:12px; border:1px solid var(--gray-border); background:var(--surface)}
+.whybox.why{border-top:1px solid var(--gray-border); margin-top:10px}
+.tripnote{margin-top:6px; font-size:12px; color:var(--muted); text-align:center}
+.alarm-btn{margin-top:8px; min-height:48px}
+.alarm-btn[aria-pressed=true]{border-color:var(--mint-ink); color:var(--mint-ink)}
+.alarm-sub{margin-top:4px; font-size:12px; color:var(--muted); text-align:center}
+.acts{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:10px}
+.acts .btn{padding:10px 8px; font-size:13.5px; text-decoration:none}
+.where .hrow{display:flex; align-items:center; justify-content:space-between; gap:8px; margin:0 0 14px}
+.where .hrow h2{margin:0}
+.reset{background:none; border:0; min-height:40px; padding:0 4px; font-size:13px; font-weight:700; color:var(--muted); text-decoration:underline; text-underline-offset:3px}
+.themebtn{width:40px; height:40px; border-radius:20px; border:1px solid var(--gray-border); background:var(--surface); display:grid; place-items:center; color:var(--dark-gray)}
+.themebtn svg{width:18px; height:18px}
+
+/* ── v1.1 다크(기본): 남색·보라 밤하늘 + 도시 스카이라인. 순검정 면은 쓰지 않는다 ── */
+.sky{display:none}
+html[data-theme=dark]{
+  color-scheme:dark;
+  --white:#15143a; --black:#EEEBFF;
+  --surface:rgba(36,34,88,.80); --surface-solid:#23215a; --topbg:rgba(21,20,58,.86);
+  --gray-light:#2d2b6a; --gray-border:#3d3b7c; --dark-gray:#D6D2F2; --muted:#AFAAD8; --gray:#9D98CA; --ink-soft:#4a4790;
+  --mint-light:rgba(62,207,178,.16); --mint-ink:#6FE6CE; --on-ink:#14133a; --on-mint:#0c1a24;
+  --red:#FCA5A5; --red-deep:#FECACA; --red-bg:rgba(248,113,113,.12); --red-line:rgba(252,165,165,.55); --red-tag:rgba(248,113,113,.2);
+  --key-line:rgba(111,230,206,.5);
+}
+html[data-theme=dark] body{background:#15143a}
+html[data-theme=dark] .sky{display:block; position:fixed; inset:0; z-index:0; pointer-events:none;
+  background:linear-gradient(180deg,#100f2e 0%,#1a1848 45%,#2a2064 80%,#33256c 100%)}
+html[data-theme=dark] .sky::before{content:""; position:absolute; inset:0 0 40% 0; opacity:.85;
+  background:
+    radial-gradient(1.4px 1.4px at 8% 12%, #fff 50%, transparent 52%),
+    radial-gradient(1px 1px at 22% 30%, #fff 50%, transparent 52%),
+    radial-gradient(1.6px 1.6px at 37% 8%, #fff 50%, transparent 52%),
+    radial-gradient(1px 1px at 51% 22%, #fff 50%, transparent 52%),
+    radial-gradient(1.3px 1.3px at 66% 14%, #fff 50%, transparent 52%),
+    radial-gradient(1px 1px at 79% 34%, #fff 50%, transparent 52%),
+    radial-gradient(1.5px 1.5px at 91% 9%, #fff 50%, transparent 52%),
+    radial-gradient(1px 1px at 14% 52%, #fff 50%, transparent 52%),
+    radial-gradient(1.2px 1.2px at 58% 46%, #fff 50%, transparent 52%),
+    radial-gradient(1px 1px at 86% 58%, #fff 50%, transparent 52%)}
+html[data-theme=dark] .sky svg{position:absolute; left:0; right:0; bottom:0; width:100%; height:120px}
+html[data-theme=dark] .shell{position:relative; z-index:1; padding-bottom:110px}
+html[data-theme=dark] .top{-webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px)}
+html[data-theme=dark] .card,html[data-theme=dark] .where,html[data-theme=dark] .conds-card,html[data-theme=dark] .verdict,
+html[data-theme=dark] .whybox{-webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px)}
+html[data-theme=dark] .go-btn,html[data-theme=dark] .trip-btn,html[data-theme=dark] .alarm-btn{border-radius:999px}
+html[data-theme=dark] .od{box-shadow:none}
+html[data-theme=dark] .glow{
+  --fill:color-mix(in srgb, #1b2f55, #3d1838 calc(var(--heat)*100%))}
+html[data-theme=dark] .trip{box-shadow:0 6px 18px rgba(8,6,30,.35)}
+html[data-theme=dark] .mk{box-shadow:0 4px 12px rgba(8,6,30,.45)}
+html[data-theme=dark] .verdict.hold,html[data-theme=dark] .leg.miss{border-color:#8a86b8; outline-color:#8a86b8}
+html[data-theme=dark] .verdict .basis,html[data-theme=dark] .tag.bus{border-color:#8a86b8}
+html[data-theme=dark] dialog.sheet::backdrop{background:rgba(8,6,30,.6)}
 </style>
 </head>
 <body>
+<div class="sky" aria-hidden="true">
+  <svg viewBox="0 0 480 120" preserveAspectRatio="xMidYMax slice">
+    <path fill="#1d1a4d" d="M0 120V78h18V64h14v-8h10v8h12V70h16V48h6v-6h8v6h6v22h14V58h20v20h10V40h4v-8h4v8h4v38h12V62h18v-12h10v12h8v16h16V54h22v24h8V66h12v-10h14v10h6v12h18V44h8v-10h6v10h8v34h12V60h16v18h10V70h14V52h20v26h8V62h16v16h18V68h14v52z"/>
+    <path fill="#141239" d="M0 120V96h26V86h20v10h18V80h22v16h16V88h28v8h14V76h12v20h22V90h18v6h24V82h20v14h16V92h22v4h18V78h14v18h20V88h26v8h18V84h16v12h22V90h24v30z"/>
+    <g fill="#F6D58E" opacity=".55"><rect x="78" y="56" width="3" height="4"/><rect x="152" y="46" width="3" height="4"/><rect x="152" y="60" width="3" height="4"/><rect x="236" y="62" width="3" height="4"/><rect x="315" y="44" width="3" height="4"/><rect x="398" y="60" width="3" height="4"/><rect x="26" y="70" width="3" height="4"/></g>
+  </svg>
+</div>
 <div class="shell">
   <header class="top">
     <h1 class="brand">라스트<span class="accent">레인</span></h1>
-    <span class="pill">v1.0</span>
+    <span class="pill">v1.1</span>
     <span class="spacer"></span>
     <span class="who">Team 04</span>
+    <button type="button" class="themebtn" id="themeBtn"></button>
   </header>
 
   <!-- ① 홈: 조건을 다 찍는 곳 -->
   <main id="home">
     <section class="where" aria-labelledby="whereH">
-      <h2 id="whereH">어디로 가세요?</h2>
+      <div class="hrow"><h2 id="whereH">어디로 가세요?</h2><button type="button" class="reset" id="resetBtn" hidden>다시 고르기</button></div>
       <div class="od">
         <button type="button" class="od-row" id="fromBtn" aria-expanded="false" aria-controls="qOut">
           <i class="dot dot-o" aria-hidden="true"></i><span class="k">출발</span>
@@ -424,7 +503,7 @@ td.n{font-variant-numeric:tabular-nums; white-space:nowrap; font-weight:500}
         <path d="M69 30L64 50" class="torso"/>
         <g class="limb arm a1"><path d="M68 33L60 41 65 47"/></g>
         <g class="limb arm a2"><path d="M68 33L76 40 83 34"/></g>
-        <circle cx="72" cy="19" r="8" fill="#11705F"/>
+        <circle class="head" cx="72" cy="19" r="8"/>
       </g>
     </svg>
     <p class="ld-h">막차 연결을 계산하고 있어요</p>
@@ -448,8 +527,21 @@ td.n{font-variant-numeric:tabular-nums; white-space:nowrap; font-weight:500}
     </div>
 
     <p class="trip glow" id="tripBanner" role="status" hidden><svg class="ck" viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="12"/><path d="M8.5 14.5l3.6 3.6 7.4-7.6"/></svg><span id="tripTxt"></span></p>
+    <p class="tripnote" id="tripNote" hidden>출발 시각과 평균 소요시간으로 추정한 위치예요</p>
     <section id="verdict" class="verdict" aria-label="판정"></section>
-    <button type="button" class="btn primary block trip-btn" id="tripBtn" hidden>출발했어요 · 안내 시작</button>
+    <details class="why whybox" id="whyBox">
+      <summary>자세히 보기 · 거꾸로 계산한 과정
+        <svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </summary>
+      <p class="faint">
+        도착지에서 거꾸로 올라오며 각 구간을 “늦어도 몇 시에 시작해야 하는가”로 바꿔요.
+        맨 앞까지 오면 그게 최종 출발 마감시각이에요.
+      </p>
+      <table id="calc"></table>
+    </details>
+    <button type="button" class="btn primary block trip-btn" id="tripBtn" hidden>예상 이동 경로 보기</button>
+    <button type="button" class="btn block alarm-btn" id="alarmBtn" aria-pressed="false" hidden></button>
+    <p class="alarm-sub" id="alarmSub" hidden>이 화면을 열어 두는 동안만 알려 드려요</p>
     <p id="sr" class="sr-only" aria-live="polite"></p>
 
 
@@ -458,26 +550,25 @@ td.n{font-variant-numeric:tabular-nums; white-space:nowrap; font-weight:500}
     <p class="faint" id="dayNote" style="padding-top:10px" hidden></p>
     <div class="legwrap"><div id="legs"></div><span class="mk" id="mk" hidden></span></div>
   </div>
+  <h2 class="sec">지도 앱으로 이어 보기</h2>
+  <div class="acts">
+    <a class="btn" id="kakaoLink" target="_blank" rel="noopener">카카오맵</a>
+    <a class="btn" id="naverLink" target="_blank" rel="noopener">네이버 지도</a>
+    <button type="button" class="btn" id="shareBtn">공유하기</button>
+  </div>
   </div>
 
   <section id="dev" class="dev" hidden aria-labelledby="devH">
     <h2 class="sec" id="devH">개발자 모드 · 판정 근거</h2>
     <div class="card" style="padding:4px 18px 10px">
       <div class="explain" id="explain" style="border-top:0"></div>
-    <details class="why">
-      <summary>왜 이 시각인가요
-        <svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </summary>
-      <p class="faint">
-        도착지에서 거꾸로 올라오며 각 구간을 “늦어도 몇 시에 시작해야 하는가”로 바꿉니다.
-        맨 앞까지 오면 그게 최종 출발 마감시각입니다.
-      </p>
-      <table id="calc"></table>
-    </details>
     </div>
   <div class="note">
     <b>데이터 출처.</b> 경로·구간 소요시간·도보시간은 조원 사용자 조사(2026-10-23)에서 수집한
-    지도 앱 실측값입니다. 막차 시각은 평일 11개 경로 전부, 토·일은 6개 경로만 확인돼 있습니다.
+    지도 앱 실측값입니다. 막차 시각은 조사값을 서울 열린데이터광장 역별 시간표, 국토부 TAGO 지하철 시간표,
+    서울·경기 버스 노선 API(2026-10-30 조회)와 대조했고, 둘이 다르면 더 이른 쪽을 씁니다.
+    토요일 시간표가 없는 노선(김포골드라인·GTX-A·신림선)은 일요일 값을 씁니다. 토·일 5511 버스 막차는 아직 모릅니다.
+    택시 요금은 카카오모빌리티 예상 요금(23:30 출발)에 서울 심야 할증 40%를 더한 추정이며 시계외 할증은 빠져 있습니다.
     버스 구간은 시간표 기준이라 실제 운행과 다를 수 있어 따로 표시했습니다.
   </div>
   </section>
@@ -569,43 +660,63 @@ const ROUTES = [
 
  {id:"R07", from:"IFC서울", to:"운양역", legs:[
    W("도보","Two IFC","여의도역",7,"417m"),
-   S("9호선 급행","여의도","김포공항",19,"00:46",null,"당산역 방면 · 5개역"),
+   S("9호선 급행","여의도","김포공항",19,"00:46","23:45","당산역 방면 · 5개역"),
    W("환승 도보·대기","9호선","김포골드라인",6,"255m + 대기 3분"),
-   S("김포골드라인","김포공항","운양",19,"00:29",null,"고촌역 방면 · 5개역")]},
+   S("김포골드라인","김포공항","운양",19,"23:29","23:30","고촌역 방면 · 5개역")]},
 
  {id:"R08", from:"숭실대입구역", to:"동탄역", legs:[
-   S("7호선","숭실대입구","고속터미널",9,"00:16",null,"남성역 방면 · 4개역"),
+   S("7호선","숭실대입구","고속터미널",9,"00:16","23:46","남성역 방면 · 4개역"),
    W("환승 도보","7호선","3호선",4,"110m"),
-   S("3호선","고속터미널","수서",20,"00:40",null,"교대역 방면"),
+   S("3호선","고속터미널","수서",20,"00:40","23:43","교대역 방면"),
    W("환승 도보","3호선","GTX-A",4,"127m"),
-   S("GTX-A","수서","동탄",21,"00:39",null,"성남역 방면 · 3개역"),
+   S("GTX-A","수서","동탄",21,"00:39","00:39","성남역 방면 · 3개역"),
    W("도보","동탄역","도착지",1,"62m")]},
 
  {id:"R09", from:"동국대 중앙도서관", to:"운정역", legs:[
    W("도보","중앙도서관","충무로역",13,"815m"),
-   S("4호선","충무로","서울역",4,"00:09",null,"명동역 방면 · 3개역"),
+   S("4호선","충무로","서울역",4,"00:09","23:56","명동역 방면 · 3개역"),
    W("환승 도보·대기","4호선","GTX-A",12,"500m + 대기 5분"),
-   S("GTX-A","서울역","운정중앙",21,"00:38",null,"연신내역 방면 · 4개역"),
+   S("GTX-A","서울역","운정중앙",21,"00:38","00:38","연신내역 방면 · 4개역"),
    W("환승 도보","운정중앙역","정류장",2,"65m"),
-   B("074","운정중앙역","운정역",17,null,null),
+   B("074","운정중앙역","운정역",17,"00:00","00:00"),
    W("도보","운정역","도착지",2,"93m")]},
 
  {id:"R10", from:"서울대 관정도서관", to:"한대앞역", daytime:true, legs:[
    W("도보","관정도서관","농생대",7,"456m"),
-   B("5511","농생대","서울대입구역",10,null,null),
+   B("5511","농생대","서울대입구역",10,"23:28",null),
    W("환승 도보","정류장","서울대입구역",4,"139m"),
-   S("2호선","서울대입구","사당",4,"00:40",null,"낙성대역 방면 · 2개역"),
+   S("2호선","서울대입구","사당",4,"00:40","23:41","낙성대역 방면 · 2개역"),
    W("환승 도보·대기","2호선","4호선",3,"111m + 대기 1분"),
-   S("4호선","사당","한대앞",42,"00:20",null,"남태령역 방면 · 16개역")]},
+   S("4호선","사당","한대앞",42,"23:42","23:38","남태령역 방면 · 16개역")]},
 
  {id:"R11", from:"서울대 행정관", to:"범계역", legs:[
    W("도보","행정관","관악산역",19,"1.3km"),
-   S("신림선","관악산","신림",5,"23:32",null,"서울대벤처타운역 방면 · 3개역"),
+   S("신림선","관악산","신림",5,"23:32","23:32","서울대벤처타운역 방면 · 3개역"),
    W("환승 도보·대기","신림선","2호선",15,"389m + 대기 10분"),
-   S("2호선","신림","사당",7,"23:52",null,"봉천역 방면 · 4개역"),
+   S("2호선","신림","사당",7,"23:52","23:37","봉천역 방면 · 4개역"),
    W("환승 도보·대기","2호선","4호선",7,"111m + 대기 5분"),
-   S("4호선","사당","범계",21,"00:06",null,"남태령역 방면 · 9개역")]}
+   S("4호선","사당","범계",21,"00:06","00:00","남태령역 방면 · 9개역")]}
 ];
+
+/* 막차 출처 메모 (2026-10-30 공공데이터 보강). 조사값과 다르면 더 이른(안전한) 값을 씀 */
+const LAST_NOTE = {
+  "R07:김포공항→운양": {weekday:"국토부 TAGO 시간표", weekend:"일요일 시간표 기준"},
+  "R08:수서→동탄":     {weekend:"일요일 시간표 기준"},
+  "R09:서울역→운정중앙": {weekend:"일요일 시간표 기준"},
+  "R11:관악산→신림":   {weekend:"일요일 시간표 기준"},
+  "R09:운정중앙역→운정역": {weekday:"기점 막차 기준 · 이 정류장은 더 늦게 지나요", weekend:"기점 막차 기준 · 이 정류장은 더 늦게 지나요"},
+  "R10:농생대→서울대입구역": {weekday:"정류장 시간표 기준"},
+  "R10:사당→한대앞":   {weekday:"한대앞까지 가는 열차 기준"},
+};
+ROUTES.forEach(r => r.legs.forEach(l => { const n = LAST_NOTE[`${r.id}:${l.from}→${l.to}`]; if(n) l.lastNote = n; }));
+
+/* 택시 대안 — 카카오모빌리티 예상(다음 평일 23:30 출발) + 서울 중형택시 심야할증 40%, 시계외 할증 별도 */
+const TAXI = {R01:[59400,37],R02:[43400,26],R03:[44800,25],R04:[47900,33],R05:[44100,37],R06:[43200,31],
+              R07:[44700,24],R08:[76400,42],R09:[70400,40],R10:[47000,34],R11:[28500,25]};
+/* 도착지 좌표 (카카오 로컬) — 지도 앱 연결용 */
+const DEST_XY = {R01:[37.26579,127.00009],R02:[37.67616,126.74750],R03:[37.65321,127.24444],R04:[37.48945,126.72433],
+                 R05:[37.73836,127.04596],R06:[37.32249,127.09466],R07:[37.65378,126.68384],R08:[37.19976,127.09549],
+                 R09:[37.72560,126.76716],R10:[37.30943,126.85402],R11:[37.38978,126.95078]};
 
 /* 걸음 속도 배율 — 10/3 인터뷰 근거(“발목 깁스한 상태인데 지도 앱 도보 시간과 차이가 많이 났다”) */
 const TEMPOS = [{k:"많이 느림 (깁스·짐)",m:1.8},{k:"느림",m:1.35},{k:"보통",m:1.0},
@@ -674,7 +785,7 @@ let state = {
   route: ROUTES.some(r=>r.id===store.get("route")) ? store.get("route") : null, screen:"home", dev:false, abs:false, trip:null, tripLeg:null,
   when:{mode:"now", off:0, t:23*60+10},
   tempo: (()=>{ const t=+store.get("tempo"); return Number.isInteger(t)&&t>=0&&t<=4&&store.get("tempo")!==null ? t : 2; })(),
-  day: liveDay(), live:true, nowS: liveNowS(), ff:null
+  day: liveDay(), live:true, sim:false, nowS: liveNowS(), ff:null, alarm:null
 };
 let lastSR=null;
 
@@ -698,6 +809,9 @@ function render(){
   const mul = TEMPOS[state.tempo].m, day = state.day, legs = r.legs;
   const res = judge(legs, mul, day);
   const nowTxt = (state.live ? "지금 " : "기준 시각 ") + fmtS(state.nowS);
+  /* 지금 시계(또는 빨리 감기)면 "지금 나가면", 시각을 직접 골랐으면 "23:10에 출발하면" */
+  const nowish = state.live || state.sim, atT = fmt(Math.floor(state.nowS/60));
+  const goWord = nowish ? "지금 나가면" : `${atT}에 출발하면`;
 
   /* 결과 상단: 무엇을 어떤 조건으로 판정했는지 */
   $("#rDest").textContent = r.to;
@@ -706,6 +820,8 @@ function render(){
   $("#basisChip").textContent = `${day==="weekday"?"평일":"토·일"} 막차 기준`;
 
   const bindLeg = res.bindAt!=null ? legs[res.bindAt] : null;
+  const legName = l => l.name + (l.mode==="bus" ? " 버스" : "");
+  const why1 = bindLeg ? `<p class="why1">오늘 마감은 ${esc(legName(bindLeg))} ${esc(station(bindLeg))} 막차 <b>${lastOf(bindLeg,day)}</b> 기준이에요</p>` : "";
   const busBasis = bindLeg && bindLeg.uncertain
     ? `<span class="basis">버스 시간표 기준 · 실제와 다를 수 있음</span>` : "";
 
@@ -742,21 +858,22 @@ function render(){
   } else if(rem > 3600){
     kind = rem > 3*3600 ? "early" : "plan"; cls="go glow";
     v.innerHTML = `
-      <p class="call">${kind==="early" ? "오늘 밤 막차까지 여유 있어요" : "지금 나가면 탈 수 있어요"}</p>
+      <p class="call">${kind==="early" ? "오늘 밤 막차까지 여유 있어요" : goWord+" 탈 수 있어요"}</p>
       <p class="dl-label">최종 출발 마감시각</p>
       <p class="hero"><span class="num">${fmt(res.deadline)}</span></p>
       <p class="meta"><b>${remainText(rem)}</b> 남음 · ${nowTxt}</p>${tempoLine}${busBasis}`
-      + (kind==="early" && state.live ? `<p class="meta" style="margin-top:12px">밤 상황은 뒤로 가서 출발 시각을 바꿔 보세요.</p>` : "");
+      + (kind==="early" && state.live ? `<p class="meta" style="margin-top:12px">밤 상황은 뒤로 가서 출발 시각을 바꿔 보세요.</p>` : "") + why1;
     sr = `탈 수 있어요. 마감 ${fmt(res.deadline)}.`;
   } else if(rem >= 0){
     kind="go";
     cls = "go glow" + (rem<=60 ? " u1" : "");
-    const call = rem<=300 ? "지금 바로 나가야 해요" : "지금 나가면 탈 수 있어요";
+    const call = rem<=300 ? (nowish ? "지금 바로 나가야 해요" : `${atT}에 출발하면 빠듯해요`) : goWord+" 탈 수 있어요";
     v.innerHTML = `
       <p class="call">${call}</p>
       <p class="dl-label">출발까지 남은 시간</p>
       <p class="hero">${remainHTML(rem)}</p>
-      <p class="meta"><b>${fmt(res.deadline)}</b>까지 출발 · ${nowTxt}</p>${tempoLine}${busBasis}`;
+      <p class="meta"><b>${fmt(res.deadline)}</b>까지 출발 · ${nowTxt}</p>${tempoLine}`
+      + (rem<180 ? `<p><span class="warn2">지연되면 놓칠 수 있어요</span></p>` : "") + busBasis + why1;
     sr = `${call}. 남은 시간 ${Math.floor(rem/60)}분. 마감 ${fmt(res.deadline)}.`;
   } else {
     kind="stop"; cls="stop";
@@ -764,13 +881,16 @@ function render(){
     const o = -rem;
     const overTxt = `마감 ${fmt(res.deadline)} · ` + (o<60 ? `${o}초 지남` : o<=3600 ? `${Math.floor(o/60)}분 지남` : "지남");
     const head = !fail ? "" : fail.first
-      ? `<p class="dl-label">지금 나가면</p><p class="hero place">첫 구간부터 끊겨요</p>
+      ? `<p class="dl-label">${goWord}</p><p class="hero place">첫 구간부터 끊겨요</p>
          <p class="meta">${fail.leg.name} ${station(fail.leg)} ${lastOf(fail.leg,day)} 막차가 이미 떠났어요</p>`
-      : `<p class="dl-label">지금 나가면</p><p class="hero place">${nw(station(fail.leg)+"에서")} 끊겨요</p>
+      : `<p class="dl-label">${goWord}</p><p class="hero place">${nw(station(fail.leg)+"에서")} 끊겨요</p>
          <p class="meta">${fail.leg.name} 막차 ${lastOf(fail.leg,day)}에 못 닿아요</p>`;
-    v.innerHTML = `<p class="call">지금은 막차 연결이 어려워요</p>${head}
-      <p class="meta" style="margin-top:4px">${overTxt} · ${nowTxt}</p>${tempoLine}${busBasis}`;
-    sr = fail && !fail.first ? `막차 연결이 어려워요. 지금 나가면 ${station(fail.leg)}에서 끊겨요.` : "막차 연결이 어려워요. 첫 구간부터 끊겨요.";
+    const tx = TAXI[r.id];
+    const alt = tx ? `<p class="alt">택시라면 약 <b>${tx[0].toLocaleString("ko-KR")}원</b> · ${tx[1]}분
+      <small>23:30 출발 카카오 예상 요금에 심야 할증 40%를 더한 추정이에요. 시계외 할증은 빠져 있어 더 나올 수 있어요.</small></p>` : "";
+    v.innerHTML = `<p class="call">${nowish ? "지금은 막차 연결이 어려워요" : "이 시각엔 막차 연결이 어려워요"}</p>${head}
+      <p class="meta" style="margin-top:4px">${overTxt} · ${nowTxt}</p>${tempoLine}${busBasis}${alt}${why1}`;
+    sr = fail && !fail.first ? `막차 연결이 어려워요. ${goWord} ${station(fail.leg)}에서 끊겨요.` : "막차 연결이 어려워요. 첫 구간부터 끊겨요.";
   }
   v.className = "verdict " + cls + (cls==="stop" ? " glow" : "");
   v.style.setProperty("--heat", kind==="go" ? Math.max(0, Math.min(1, (600-rem)/600)).toFixed(3) : kind==="stop" ? "1" : "0");
@@ -815,11 +935,16 @@ function render(){
       if(walk){ const dm=distM(lg); sub = `<span class="live">${dm ? `남은 거리 약 ${Math.max(10, Math.round(dm*(1-f)/10)*10)}m · ` : ""}${Math.max(1,Math.ceil(leftS/60))}분 걸으면 도착</span>`; }
       else { const n=stopCount(lg); sub = `<span class="live">${n ? `약 ${Math.max(1,Math.ceil(n*(1-f)))}개역 남음 · ` : ""}하차까지 ${short(leftS)}</span>`; }
     } else if(walk) sub = `도보 ${d}분${mul!==1 ? ` (지도 앱 ${lg.min}분)` : ""}${lg.note ? ` · ${lg.note}` : ""}`;
-    else sub = `${d}분${lg.dir?` · ${lg.dir}`:""}${raw?` · ${nw("막차 "+raw)}`:""}`;
+    else sub = `${d}분${lg.dir?` · ${lg.dir}`:""}${raw?` · ${nw("노선 막차 "+raw)}`:""}`
+      + (raw && lg.lastNote && lg.lastNote[day] ? `<span class="lnote">${esc(lg.lastNote[day])}</span>` : "");
     let etaLine="";
     if(!walk && raw && (!state.trip || i>cur)){
       const gap = Math.round((toMin(raw) - eta[i])*60);
-      etaLine = `<span class="eta ${gap<0?"late":""}">${nw("도착 예상 "+fmt(Math.floor(eta[i])))} · ${gap>=0 ? nw("막차까지 "+short(gap)+" 여유") : nw("막차보다 "+short(-gap)+" 늦어요")}</span>`;
+      etaLine = `<span class="eta ${gap<0?"late":""}">${nw(esc(station(lg))+" 도착 "+fmt(Math.floor(eta[i])))} · ${gap>=0 ? nw("막차까지 "+short(gap)+" 여유") + (gap<180 ? " · "+nw("지연되면 놓칠 수 있어요") : "") : `<b>${nw("막차보다 "+short(-gap)+" 늦어요")}</b>`}</span>`;
+    }
+    const cut = !state.trip && res.cuts.find(c=>c.i===i);
+    if(cut){
+      etaLine += `<span class="cutnote">${INFO}<span>노선 막차 ${fmt(cut.last)}보다 ${cut.gap}분 이른 ${fmt(cut.must)}에 타야 다음 구간에 이어져요</span></span>`;
     }
     const tags = [
       isFail ? `<span class="tag cut">여기서 끊김</span>` : "",
@@ -828,12 +953,12 @@ function render(){
     ].join("");
     let rt="";
     if(miss) rt = `<span class="rt"><span class="k">막차</span><span class="v">미확인</span></span>`;
-    else if(cur!=null && i<cur) rt = `<span class="rt done"><span class="k">${walk?"도착 완료":"하차 완료"}</span><span class="v">${fmt(Math.floor(eta[i+1]))}</span></span>`;
+    else if(cur!=null && i<cur) rt = `<span class="rt done"><span class="k">${walk?"도착(예상)":"하차(예상)"}</span><span class="v">${fmt(Math.floor(eta[i+1]))}</span></span>`;
     else if(cur===i) rt = `<span class="rt"><span class="k">${walk?"도착 예정":"하차 예정"}</span><span class="v">${fmt(Math.floor(eta[i+1]))}</span></span>`;
     else if(res.req[i]!=null){
       const left = res.req[i]*60 - state.nowS;
       const past = left<0;
-      const k = past ? (walk?"출발 마감 지남":"탑승 마감 지남") : state.abs ? (walk?"늦어도 출발":"늦어도 탑승") : (walk?"출발까지":"탑승까지");
+      const k = past ? (walk?"출발 마감 지남":"탑승 마감 지남") : state.abs ? (walk?"늦어도 출발":"늦어도 탑승") : (walk?"출발 마감까지":"탑승 마감까지");
       const val = past || state.abs ? fmt(res.req[i]) : short(left);
       rt = `<button type="button" class="rtbtn ${past?"past":""}" data-abs aria-label="${k} ${val}. 눌러서 ${state.abs?"남은 시간":"시각"}으로 보기"><span class="k">${k}</span><span class="v">${val}</span></button>`;
     } else if(walk && !legs.slice(i+1).some(x=>x.mode!=="walk")) rt = `<span class="rt"><span class="k">도착까지</span><span class="v">${d}분</span></span>`;
@@ -874,8 +999,27 @@ function render(){
   /* 출발했어요 모드 */
   const tb=$("#tripBtn"), ban=$("#tripBanner");
   tb.hidden = !state.trip && !(kind==="go" || kind==="plan");
-  tb.textContent = state.trip ? "안내 끝내기" : "출발했어요 · 안내 시작";
+  tb.textContent = state.trip ? "경로 보기 끝내기" : "예상 이동 경로 보기";
   tb.classList.toggle("off", !!state.trip);
+  $("#tripNote").hidden = !state.trip;
+  $("#whyBox").hidden = res.hold || !!state.trip;
+  /* 마감 10분 전 알림 */
+  const ab=$("#alarmBtn"), on = !!state.alarm && state.alarm.route===r.id;
+  const alarmAt = res.hold ? null : res.deadline-10;
+  ab.hidden = !!state.trip || res.hold || !(on ? rem>=0 : rem>600);
+  $("#alarmSub").hidden = ab.hidden;
+  ab.setAttribute("aria-pressed", String(on));
+  ab.textContent = on ? `알림 켜짐 · ${fmt(alarmAt)}에 알려 드려요` : "마감 10분 전에 알려 주세요";
+  if(on && !state.alarm.fired && rem!=null && rem<=600 && rem>=0){
+    state.alarm.fired = true;
+    const t1 = "출발 마감 10분 전이에요", t2 = `${fmt(res.deadline)}까지 나가야 ${r.to}까지 막차로 가요`;
+    showToast(t1, t2);
+    try{ if("Notification" in window && Notification.permission==="granted") new Notification("라스트레인 · "+t1, {body:t2}); }catch(e){}
+  }
+  const xy = DEST_XY[r.id];
+  $("#kakaoLink").href = xy ? `https://map.kakao.com/link/to/${encodeURIComponent(r.to)},${xy[0]},${xy[1]}` : `https://map.kakao.com/?q=${encodeURIComponent(r.to)}`;
+  $("#naverLink").href = `https://map.naver.com/p/search/${encodeURIComponent(r.to)}`;
+  state.shareText = shareText(r, res, kind, day);
   ban.hidden = !state.trip; ban.classList.remove("done"); ban.style.setProperty("--heat","0"); v.hidden = !!state.trip;
   if(state.trip){
     let msg;
@@ -899,15 +1043,28 @@ function render(){
 const ie = w => { const c=w.charCodeAt(w.length-1)-0xAC00; return w + ((c>=0&&c<=11171&&c%28!==0) ? "이에요" : "예요"); };
 const TRAIN='<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="4" y="2.5" width="12" height="12.5" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M4.5 9h11" stroke="currentColor" stroke-width="1.6"/><circle cx="7.5" cy="12" r="1" fill="currentColor"/><circle cx="12.5" cy="12" r="1" fill="currentColor"/><path d="M7 15.5L5.5 18M13 15.5l1.5 2.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
 const WALKER='<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="11" cy="3.6" r="1.9" fill="currentColor"/><path d="M10.5 7l-2.2 4.2 2.7 2.3-1 4.5M10.5 7l2.4 2.4 2.6.6M8.3 11.2L6 17.5M10.5 7L7.6 8.6 6.3 11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const INFO='<svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5"/><path d="M8 7.2v4M8 4.9v.1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>';
+function shareText(r, res, kind, day){
+  const head = `라스트레인 · ${r.from} → ${r.to}`;
+  const when = `${whenLabel()} 기준 (${day==="weekday"?"평일":"토·일"} 막차)`;
+  let body;
+  if(res.hold) body = "막차 시각을 모르는 구간이 있어서 판정을 보류했어요.";
+  else {
+    const b = r.legs[res.bindAt];
+    body = `최종 출발 마감 ${fmt(res.deadline)}\n오늘 마감은 ${b.name}${b.mode==="bus"?" 버스":""} ${station(b)} 막차 ${lastOf(b,day)} 기준`;
+    if(kind==="stop") body += "\n이 시각엔 막차 연결이 어려워요.";
+  }
+  return `${head}\n${when}\n${body}\nhttps://rnjswldnjs.github.io/lastrain/`;
+}
 function stopCount(lg){ const m=(lg.dir||"").match(/(\d+)개역/); return m ? +m[1] : null; }
-function showToast(main, sub){ const t=$("#toastx"); t.innerHTML = esc(main) + (sub?`<small>${esc(sub)}</small>`:""); t.hidden=false;
+function showToast(main, sub, quiet){ const t=$("#toastx"); t.innerHTML = esc(main) + (sub?`<small>${esc(sub)}</small>`:""); t.hidden=false;
   t.style.animation="none"; void t.offsetWidth; t.style.animation="";
-  try{ navigator.vibrate && navigator.vibrate([120,60,120]); }catch(e){}
+  if(!quiet) try{ navigator.vibrate && navigator.vibrate([120,60,120]); }catch(e){}
   clearTimeout(showToast.tm); showToast.tm=setTimeout(()=>{ t.hidden=true; }, 4500); }
 /* 지금 위치 마커: 구간 줄의 레일 위에서, 구간 안 경과 시간 비율만큼 내려간다 */
 function placeMarker(legs, eta, cur){
   const mk=$("#mk");
-  if(!state.trip){ mk.hidden=true; $("#toastx").hidden=true; state.alerted={}; return; }
+  if(!state.trip){ mk.hidden=true; state.alerted={}; return; }
   const rows=[...document.querySelectorAll("#legs .leg")], NODE=21;
   const m=state.nowS/60; let y, icon;
   if(cur>=legs.length){ y=rows[rows.length-1].offsetTop+NODE; icon=WALKER; }
@@ -958,7 +1115,7 @@ function basisText(){
   return {type, html: `이날은 <b>${type==="weekday"?"평일":"토·일"} 막차 시각</b>으로 판정해요.`
     + (dawn ? " 새벽 0~4시는 전날 밤 막차로 봐요." : "")
     + ` 조사 데이터가 평일 / 토·일 두 가지로만 나뉘어 있어요.`
-    + (type==="weekend" ? " 토·일 막차는 11개 경로 중 6개만 확인돼 있어요." : "")};
+    + (type==="weekend" ? " 토·일은 5511 버스(관정도서관 → 한대앞역) 막차만 아직 몰라요. 토요일 시간표가 없는 노선은 일요일 값을 써요." : "")};
 }
 
 /* ─────────── 홈 ─────────── */
@@ -978,6 +1135,7 @@ function renderHome(){
   const r = state.route ? ROUTES.find(x=>x.id===state.route) : null;
   const q = qIn.value.trim();
   $("#fromTxt").textContent = r ? r.from : "출발지 선택";
+  $("#resetBtn").hidden = !r && !q && state.when.mode==="now";
   $("#fromBtn").setAttribute("aria-expanded", String(listMode==="from"));
   let h;
   if(listMode==="from")
@@ -1005,6 +1163,8 @@ function renderHome(){
 }
 function pick(id){ state.route=id; store.set("route",id); listMode="to"; qIn.value=ROUTES.find(x=>x.id===id).to; renderHome(); }
 qIn.addEventListener("input", ()=>{ listMode="to"; renderHome(); });
+$("#resetBtn").addEventListener("click", ()=>{ state.route=null; store.set("route",""); qIn.value=""; listMode="to";
+  state.when={mode:"now", off:0, t:23*60+10}; state.alarm=null; applyWhen(); renderHome(); qIn.focus(); });
 qIn.addEventListener("focus", ()=>{ if(listMode==="from"){ listMode="to"; renderHome(); } });
 $("#fromBtn").addEventListener("click", ()=>{ listMode = listMode==="from" ? "to" : "from"; renderHome(); });
 $("#qForm").addEventListener("submit", e => { e.preventDefault();
@@ -1014,7 +1174,7 @@ qOut.addEventListener("click", e => { const b=e.target.closest("[data-id]"); if(
 /* 로딩 → 결과 */
 const TIPS = [
   "깁스를 했거나 짐이 많다면 ‘내 걸음 속도’를 느리게 바꿔 보세요. 도보 시간을 내 걸음에 맞춰 다시 계산해요.",
-  "결과에서 ‘마감을 정하는 구간’이 그날 귀갓길 전체의 마감을 정해요. 그 구간 막차를 기준으로 거꾸로 계산하거든요.",
+  "결과에서 ‘자세히 보기’를 열면 어느 구간 막차가 오늘 마감을 정하는지, 거꾸로 계산한 과정이 보여요.",
   "버스가 끼어 있으면 시간표와 실제 도착이 크게 다를 수 있어요. 점선으로 표시된 구간을 꼭 확인하세요.",
   "결과 화면에서도 걸음 속도를 바꿀 수 있어요. 바꾸면 마감이 몇 분 움직이는지 바로 보여 줘요."
 ];
@@ -1024,10 +1184,10 @@ $("#goBtn").addEventListener("click", () => {
   store.set("last", state.route);
   $("#tipTxt").textContent = TIPS[tipIdx]; tipIdx=(tipIdx+1)%TIPS.length; store.set("tip", tipIdx);
   state.screen="loading"; render(); window.scrollTo({top:0});
-  setTimeout(() => { applyWhen(); lastSR=null;
+  setTimeout(() => { state.sim=false; applyWhen(); lastSR=null;
     state.screen="result"; render(); window.scrollTo({top:0}); $("#rDest").focus({preventScroll:true}); }, 1400);
 });
-$("#backBtn").addEventListener("click", () => { stopFF(); state.trip=null; state.screen="home"; render(); renderHome(); window.scrollTo({top:0}); });
+$("#backBtn").addEventListener("click", () => { stopFF(); state.trip=null; $("#toastx").hidden=true; state.screen="home"; render(); renderHome(); window.scrollTo({top:0}); });
 
 /* 바텀시트 */
 function openSheet(id){ const d=$(id); if(d.showModal) d.showModal(); else d.setAttribute("open",""); }
@@ -1095,7 +1255,7 @@ playBtn.addEventListener("click", () => {
     ffNote.hidden=false; clearTimeout(noteTimer); noteTimer=setTimeout(()=>{ ffNote.hidden=true; }, 3500);
     return;
   }
-  state.live=false;
+  state.live=false; state.sim=true;
   if(!state.trip && rem > 600) state.nowS = res.deadline*60 - 600;          // 10분 전으로 건너뛰기
   playBtn.setAttribute("aria-pressed","true"); $("#playTxt").textContent="멈춤";
   $("#playIco").innerHTML='<path d="M3.5 2.5h3v11h-3zM9.5 2.5h3v11h-3z"/>';
@@ -1106,6 +1266,26 @@ $("#legs").addEventListener("click", e => { if(e.target.closest("[data-abs]")){ 
 $("#tripBtn").addEventListener("click", () => {
   state.trip = state.trip ? null : {start: state.nowS}; state.tripLeg=null; render();
 });
+$("#alarmBtn").addEventListener("click", () => {
+  if(state.alarm && state.alarm.route===state.route){ state.alarm=null; render(); return; }
+  state.alarm = {route:state.route, fired:false};
+  try{ if("Notification" in window && Notification.permission==="default") Notification.requestPermission().catch(()=>{}); }catch(e){}
+  render();
+});
+$("#shareBtn").addEventListener("click", async () => {
+  const text = state.shareText || "";
+  try{ if(navigator.share){ await navigator.share({title:"라스트레인", text}); return; } }
+  catch(e){ if(e && e.name==="AbortError") return; }
+  try{ await navigator.clipboard.writeText(text); showToast("귀갓길 정보를 복사했어요", "메신저에 붙여 넣으면 돼요", true); }
+  catch(e){ showToast("복사하지 못했어요", "브라우저가 클립보드 접근을 막았어요", true); }
+});
+const SUN='<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="3.6" stroke="currentColor" stroke-width="1.7"/><path d="M10 2.5v1.8M10 15.7v1.8M2.5 10h1.8M15.7 10h1.8M4.7 4.7l1.3 1.3M14 14l1.3 1.3M4.7 15.3L6 14M14 6l1.3-1.3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>';
+const MOON='<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M16.5 12.3A6.8 6.8 0 0 1 7.7 3.5a6.8 6.8 0 1 0 8.8 8.8z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>';
+function setTheme(t){ document.documentElement.dataset.theme=t; store.set("theme",t);
+  const b=$("#themeBtn"); b.innerHTML = t==="dark" ? SUN : MOON; b.setAttribute("aria-label", t==="dark" ? "밝은 화면으로 보기" : "어두운 화면으로 보기");
+  document.querySelector('meta[name="theme-color"]').content = t==="dark" ? "#15143a" : "#f7f7f5"; }
+$("#themeBtn").addEventListener("click", ()=> setTheme(document.documentElement.dataset.theme==="dark" ? "light" : "dark"));
+setTheme(document.documentElement.dataset.theme==="light" ? "light" : "dark");
 $("#devBtn").addEventListener("click", () => { state.dev=!state.dev; $("#devBtn").setAttribute("aria-pressed", String(state.dev)); render(); });
 
 /* 실시간 시계 */
