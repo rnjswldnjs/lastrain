@@ -1,6 +1,6 @@
 # 셀 B. 구간마다 OSM 노선 고르기 -> 정차역 좌표 -> 선로 모양 잘라내기
 # 셀 A의 SUB, OSM, overpass, P 를 그대로 씀
-import json, os, re, math, time
+import json, os, re, math, time, requests
 
 def norm(n):
     n = re.sub(r"\(.*?\)", "", n or "").replace(" ", "")
@@ -74,14 +74,22 @@ GEOM = json.load(open(GP)) if os.path.exists(GP) else {}
 for rel_id in sorted({str(v["rel"]) for v in SEG.values()}):
     if rel_id in GEOM:
         continue
+    # OSM 공식 API(/full)로 받음. Overpass보다 덜 막힘
     try:
-        d = overpass(f"[out:json][timeout:150];rel({rel_id});out geom;")
-    except RuntimeError:
-        print("선로 받기 실패. 이 셀만 다시 실행하면 이어서 받음")
+        r = requests.get(f"https://api.openstreetmap.org/api/0.6/relation/{rel_id}/full.json",
+                         headers=HDR, timeout=120)
+        r.raise_for_status()
+        els = r.json()["elements"]
+    except Exception as e:
+        print(f"  relation {rel_id} 실패 ({type(e).__name__}). 이 셀만 다시 실행하면 이어서 받음")
         break
-    ways = [m["geometry"] for m in d["elements"][0]["members"]
+    nd = {e["id"]: (e["lat"], e["lon"]) for e in els if e["type"] == "node"}
+    wy = {e["id"]: e["nodes"] for e in els if e["type"] == "way"}
+    rel = next(e for e in els if e["type"] == "relation" and str(e["id"]) == rel_id)
+    ways = [[{"lat": nd[n][0], "lon": nd[n][1]} for n in wy[m["ref"]] if n in nd]
+            for m in rel["members"]
             if m["type"] == "way" and m["role"] in ("", "forward", "backward")
-            and m.get("geometry")]
+            and m["ref"] in wy]
     pts_all = []
     for w in ways:
         pts = [(g["lat"], g["lon"]) for g in w]
