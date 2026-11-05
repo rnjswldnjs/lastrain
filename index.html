@@ -446,8 +446,7 @@ html[data-theme=dark] dialog.sheet::backdrop{background:rgba(8,6,30,.6)}
 html[data-theme=dark]{--map-bg:#1d1b4c; --map-grid:rgba(238,235,255,.05); --m-casing:#15143a; --m-walk:#C9C5EA; --m-ink:#EEEBFF}
 .mapcard{margin-top:10px; border-radius:12px; overflow:hidden; border:1px solid var(--gray-border); background:var(--surface)}
 .map{position:relative; height:260px; overflow:hidden; background-color:var(--map-bg);
-  background-image:linear-gradient(var(--map-grid) 1px, transparent 1px), linear-gradient(90deg, var(--map-grid) 1px, transparent 1px);
-  background-size:32px 32px}
+}
 .map svg{display:block}
 .map-empty{padding:100px 16px; text-align:center; font-size:13px; color:var(--muted)}
 .m-casing{fill:none; stroke:var(--m-casing); stroke-width:9; stroke-linecap:round; stroke-linejoin:round}
@@ -471,7 +470,7 @@ html[data-theme=dark]{--map-bg:#1d1b4c; --map-grid:rgba(238,235,255,.05); --m-ca
 .map-btn{min-height:36px; padding:0 12px; border-radius:18px; border:1px solid var(--gray-border); background:var(--surface-solid);
   font-size:12.5px; font-weight:700; color:var(--dark-gray)}
 .map-btn[aria-pressed=true]{border-color:#3B82F6; color:var(--black)}
-.map-foot{display:flex; justify-content:space-between; flex-wrap:wrap; gap:2px 10px; padding:0 10px 8px; font-size:11px; color:var(--muted)}
+.map-foot{display:flex; justify-content:space-between; flex-wrap:wrap; gap:2px 10px; padding:0 10px 8px; font-size:12px; color:var(--muted)}
 .leg.tap{cursor:pointer}
 .leg.focus{background:var(--mint-light); border-radius:10px; border-bottom-color:transparent; padding-right:10px}
 .leg .fx{display:block; width:fit-content; margin-top:5px; font-size:12.5px; font-weight:700; color:var(--black);
