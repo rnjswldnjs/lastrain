@@ -80,7 +80,7 @@ for rid, st in EXIT_ST.items():
     c = next(x[3] for x in ORIG if x[0] == rid)
     q = f'''[out:json][timeout:60];
     node["railway"="subway_entrance"](around:450,{c[0]},{c[1]});
-    out tags;'''
+    out body;'''
     try:
         els = overpass(q)["elements"]
     except RuntimeError:
