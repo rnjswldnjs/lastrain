@@ -4,7 +4,7 @@
 
 26-2 경영학부 혁신기업경영 캡스톤디자인 II · Team 04
 
-→ **[데모 바로가기](https://rnjswldnjs.github.io/lastrain/)**
+→ **[데모 바로가기](https://rnjswldnjs.github.io/lastrain/)**   ·   [중간 산출물 발표자료](https://rnjswldnjs.github.io/lastrain/deck.html)
 
 ## 무엇을 해결하는가
 

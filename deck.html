@@ -1,0 +1,878 @@
+<!doctype html>
+<html lang="ko" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>라스트레인 중간 산출물</title>
+<meta name="theme-color" content="#15143a">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<script>try{var t=localStorage.getItem("lt-deck:theme");if(t==="light")document.documentElement.dataset.theme="light"}catch(e){}</script>
+<style>
+/* 라스트레인 중간 산출물 발표자료 — 데모와 같은 토큰(밤하늘 다크 기본, 민트 포인트). 사진 없이 HTML·SVG로만 그림 */
+:root{
+  --bg:#f7f7f5; --surface:#fff; --surface2:#f3f4f6; --line:#e5e7eb; --ink:#0a0a0a; --ink2:#374151; --muted:#4b5563;
+  --mint:#3ECFB2; --mint-ink:#11705F; --mint-soft:#E6F8F4; --red:#B91C1C; --red-soft:#FEE2E2; --gold:#8a6400; --gold-soft:#FFF4D6;
+  --on-mint:#0c1a24; --shadow:0 10px 30px rgba(10,10,10,.08);
+  --fill0:#F3FBF9; --fill1:#FFF3F2;
+}
+html[data-theme=dark]{
+  color-scheme:dark;
+  --bg:#15143a; --surface:rgba(36,34,88,.86); --surface2:#2d2b6a; --line:#3d3b7c; --ink:#EEEBFF; --ink2:#D6D2F2; --muted:#AFAAD8;
+  --mint-ink:#6FE6CE; --mint-soft:rgba(62,207,178,.16); --red:#FCA5A5; --red-soft:rgba(248,113,113,.18); --gold:#F6D58E; --gold-soft:rgba(246,213,142,.14);
+  --shadow:0 10px 30px rgba(8,6,30,.35); --fill0:#1b2f55; --fill1:#3d1838;
+}
+*{box-sizing:border-box; margin:0; padding:0}
+html,body{height:100%; background:var(--bg); color:var(--ink); overflow:hidden;
+  font-family:"Pretendard","Pretendard Variable",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  -webkit-font-smoothing:antialiased; word-break:keep-all; overflow-wrap:break-word}
+button{font:inherit; color:inherit; cursor:pointer}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--mint); outline-offset:3px; border-radius:6px}
+
+/* 밤하늘 + 스카이라인 (다크에서만) */
+.sky{position:fixed; inset:0; z-index:0; pointer-events:none; display:none}
+html[data-theme=dark] .sky{display:block; background:linear-gradient(180deg,#100f2e 0%,#1a1848 45%,#2a2064 80%,#33256c 100%)}
+html[data-theme=dark] .sky::before{content:""; position:absolute; inset:0 0 40% 0; opacity:.85;
+  background:
+    radial-gradient(1.4px 1.4px at 8% 12%, #fff 50%, transparent 52%), radial-gradient(1px 1px at 22% 30%, #fff 50%, transparent 52%),
+    radial-gradient(1.6px 1.6px at 37% 8%, #fff 50%, transparent 52%), radial-gradient(1px 1px at 51% 22%, #fff 50%, transparent 52%),
+    radial-gradient(1.3px 1.3px at 66% 14%, #fff 50%, transparent 52%), radial-gradient(1px 1px at 79% 34%, #fff 50%, transparent 52%),
+    radial-gradient(1.5px 1.5px at 91% 9%, #fff 50%, transparent 52%), radial-gradient(1px 1px at 14% 52%, #fff 50%, transparent 52%),
+    radial-gradient(1.2px 1.2px at 58% 46%, #fff 50%, transparent 52%), radial-gradient(1px 1px at 86% 58%, #fff 50%, transparent 52%)}
+.sky svg{position:absolute; left:0; right:0; bottom:0; width:100%; height:16vh; opacity:.9}
+
+/* 무대: 1280×720을 화면에 맞춰 확대·축소. 세로 화면(폰)에서는 흐름 배치로 전환 */
+.stage{position:fixed; left:50%; top:50%; width:1280px; height:720px; transform-origin:center; z-index:1}
+.slide{position:absolute; inset:0; padding:54px 72px 78px; display:flex; flex-direction:column; opacity:0; visibility:hidden;
+  transition:opacity .45s ease, visibility 0s linear .45s}
+.slide.on{opacity:1; visibility:visible; transition:opacity .45s ease}
+html.flow .stage{left:0; top:0; width:100vw; height:100%; transform:none !important}
+html.flow .slide{padding:64px 18px 96px; overflow-y:auto; -webkit-overflow-scrolling:touch}
+
+/* 등장 애니메이션 */
+[data-a]{opacity:0; transform:translateY(14px)}
+.slide.on [data-a]{animation:up .6s cubic-bezier(.2,.7,.2,1) both; animation-delay:calc(var(--i,0) * 85ms + var(--d,0ms))}
+@keyframes up{to{opacity:1; transform:none}}
+@media (prefers-reduced-motion:reduce){ [data-a]{opacity:1; transform:none} .slide.on [data-a]{animation:none} }
+
+/* 타이포 */
+.eyebrow{font-size:13px; font-weight:800; letter-spacing:.08em; color:var(--mint-ink); text-transform:uppercase}
+.t{font-size:36px; font-weight:800; letter-spacing:-.8px; line-height:1.25; margin-top:8px}
+.lead{font-size:18px; color:var(--ink2); margin-top:10px; line-height:1.6}
+.small{font-size:13px; color:var(--muted); line-height:1.55}
+.hl{color:var(--mint-ink)}
+.red{color:var(--red)}
+b,strong{font-weight:800}
+.num{font-variant-numeric:tabular-nums}
+.body{flex:1; min-height:0; margin-top:24px; display:flex; flex-direction:column; justify-content:center; gap:18px}
+.g2{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+.g3{display:grid; grid-template-columns:repeat(3,1fr); gap:16px}
+.g4{display:grid; grid-template-columns:repeat(4,1fr); gap:14px}
+.g5{display:grid; grid-template-columns:repeat(5,1fr); gap:12px}
+.g73{display:grid; grid-template-columns:1.25fr 1fr; gap:18px}
+html.flow .slide{display:block}
+html.flow .body{flex:none; justify-content:flex-start}
+html.flow .mapbox{height:360px}
+html.flow .cover{padding-top:120px}
+html.flow .g2,html.flow .g3,html.flow .g4,html.flow .g5,html.flow .g73{grid-template-columns:1fr}
+html.flow .t{font-size:26px} html.flow .lead{font-size:15px}
+.card{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:18px 20px; box-shadow:var(--shadow)}
+.card h3{font-size:18px; font-weight:800; margin-bottom:8px}
+.card p,.card li{font-size:15px; line-height:1.6; color:var(--ink2)}
+.card ul{list-style:none; display:flex; flex-direction:column; gap:6px}
+.card li{padding-left:14px; position:relative}
+.card li::before{content:""; position:absolute; left:2px; top:.62em; width:5px; height:5px; border-radius:50%; background:var(--mint)}
+.k{font-size:12px; font-weight:800; color:var(--mint-ink); letter-spacing:.02em; margin-bottom:6px; display:block}
+.tag{display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:800; padding:3px 10px; border-radius:20px;
+  background:var(--mint-soft); color:var(--mint-ink)}
+.tag.red{background:var(--red-soft); color:var(--red)}
+.tag.gray{background:var(--surface2); color:var(--ink2)}
+.idea{display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:800; padding:4px 11px; border-radius:20px;
+  background:var(--gold-soft); color:var(--gold); border:1px solid color-mix(in srgb, var(--gold), transparent 60%)}
+.idea svg{width:14px; height:14px}
+.lchip{display:inline-block; font-size:12px; font-weight:800; padding:2px 8px; border-radius:6px; color:#fff; margin-right:6px; vertical-align:1px}
+.big{font-size:46px; font-weight:800; letter-spacing:-1.5px; line-height:1; font-variant-numeric:tabular-nums}
+.big small{font-size:18px; font-weight:800; margin-left:3px; letter-spacing:0}
+
+/* 데모와 같은 그라데이션 테두리 */
+@property --ang{syntax:'<angle>'; inherits:false; initial-value:0deg}
+.glow{--heat:0; border:2px solid transparent !important;
+  --fill:color-mix(in srgb, var(--fill0), var(--fill1) calc(var(--heat)*100%));
+  --g1:color-mix(in srgb, #3ECFB2, #F87171 calc(var(--heat)*100%));
+  --g2:color-mix(in srgb, #93C5FD, #FDBA74 calc(var(--heat)*100%));
+  --g3:color-mix(in srgb, #C4B5FD, #FB7185 calc(var(--heat)*100%));
+  background:linear-gradient(var(--fill),var(--fill)) padding-box,
+             conic-gradient(from var(--ang), var(--g1), var(--g2), var(--g3), var(--g1)) border-box !important;
+  animation:spin 7s linear infinite}
+@keyframes spin{to{--ang:360deg}}
+
+/* 하단 네비 */
+.nav{position:fixed; left:0; right:0; bottom:0; z-index:5; display:flex; align-items:center; justify-content:center; gap:14px;
+  padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px)); pointer-events:none}
+.nav > *{pointer-events:auto}
+.nb{width:42px; height:42px; border-radius:21px; border:1px solid var(--line); background:var(--surface); display:grid; place-items:center}
+.nb svg{width:18px; height:18px}
+.dots{display:flex; gap:6px; align-items:center; flex-wrap:wrap; justify-content:center; max-width:60vw}
+.dot{width:7px; height:7px; border-radius:50%; background:var(--line); border:0; padding:0}
+.dot.on{width:20px; border-radius:4px; background:var(--mint)}
+.cnt{font-size:13px; font-weight:800; color:var(--muted); min-width:52px; text-align:center; font-variant-numeric:tabular-nums}
+.topr{position:fixed; top:calc(12px + env(safe-area-inset-top,0px)); right:14px; z-index:5; display:flex; gap:8px}
+.tb{height:38px; padding:0 14px; border-radius:19px; border:1px solid var(--line); background:var(--surface); font-size:13px; font-weight:800;
+  display:inline-flex; align-items:center; gap:6px; text-decoration:none}
+.tb svg{width:16px; height:16px}
+html.flow .dots{display:none}
+
+/* 표지 */
+.cover{justify-content:center}
+.cover .t{font-size:64px; letter-spacing:-2px; margin-top:14px}
+.cover .t span{color:var(--mint-ink)}
+.rail{position:relative; height:46px; margin-top:34px; max-width:760px}
+.rail svg{width:100%; height:100%; overflow:visible}
+.rail .ln{stroke:var(--mint); stroke-width:4; stroke-linecap:round; fill:none; stroke-dasharray:760; stroke-dashoffset:760}
+.slide.on .rail .ln{animation:draw 1.6s .3s ease forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.rail .st{fill:var(--bg); stroke:var(--mint); stroke-width:3}
+.rail .tr{fill:var(--mint)}
+.slide.on .rail .tr{animation:ride 3.2s 1.8s ease-in-out infinite alternate}
+@keyframes ride{from{transform:translateX(0)} to{transform:translateX(680px)}}
+.members{display:flex; flex-wrap:wrap; gap:8px 18px; margin-top:40px; font-size:15px; color:var(--ink2)}
+.members b{color:var(--ink)}
+
+/* 목차 */
+.toc .card{display:flex; flex-direction:column; gap:10px; min-height:210px}
+.toc .n{font-size:40px; font-weight:800; color:var(--mint-ink); letter-spacing:-1px}
+.toc h3{font-size:20px}
+
+/* 문제: 네 시점 */
+.moments{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; position:relative}
+.moment{padding:16px; border-radius:14px; background:var(--surface); border:1px solid var(--line)}
+.moment .i{width:28px; height:28px; border-radius:50%; background:var(--mint-soft); color:var(--mint-ink); font-weight:800; display:grid; place-items:center; font-size:14px}
+.moment h4{font-size:15px; margin:10px 0 4px}
+.moment p{font-size:13px; color:var(--ink2); line-height:1.55}
+.quote{font-size:19px; font-weight:700; line-height:1.55; color:var(--ink)}
+.quote::before{content:"“"; color:var(--mint-ink); font-size:30px; line-height:0; vertical-align:-10px; margin-right:2px}
+.quote::after{content:"”"; color:var(--mint-ink); font-size:30px; line-height:0; vertical-align:-10px; margin-left:2px}
+
+/* 판정 카드 모형 */
+.vmock{border-radius:16px; padding:22px; text-align:center}
+.vmock .call{font-size:18px; font-weight:800; color:color-mix(in srgb, var(--mint-ink), var(--red) calc(var(--heat)*100%))}
+.vmock .lab{font-size:13px; font-weight:700; color:var(--ink2); margin-top:10px}
+.vmock .hero{font-size:56px; font-weight:800; letter-spacing:-2px; line-height:1.05; font-variant-numeric:tabular-nums; margin-top:4px}
+.vmock .hero small{font-size:22px; margin:0 3px 0 1px}
+.vmock .meta{font-size:14px; color:var(--ink2); margin-top:8px}
+.vmock .why{font-size:13px; color:var(--ink2); margin-top:14px; padding-top:12px; border-top:1px solid var(--line)}
+
+/* 역산 체인 */
+.chain{display:flex; align-items:stretch; gap:0; margin-top:6px}
+.cstep{flex:1; display:flex; flex-direction:column; align-items:center; text-align:center; position:relative}
+.cstep .time{font-size:30px; font-weight:800; letter-spacing:-.8px; font-variant-numeric:tabular-nums}
+.cstep .what{font-size:13.5px; color:var(--ink2); margin-top:6px; line-height:1.45; min-height:40px}
+.cstep .node{width:18px; height:18px; border-radius:50%; border:4px solid var(--mint); background:var(--bg); margin:14px 0 10px; position:relative; z-index:1}
+.cstep.end .node{background:var(--mint)}
+.cstep.dead .time{color:var(--mint-ink); font-size:38px}
+.cstep::after{content:""; position:absolute; top:calc(30px + 6px + 40px + 14px + 7px); right:50%; width:100%; height:4px; background:var(--line); z-index:0}
+.cstep:first-child::after{display:none}
+.arrowlab{font-size:12px; font-weight:800; color:var(--muted)}
+html.flow .chain{flex-direction:column; gap:14px}
+html.flow .cstep::after{display:none}
+
+/* 타임라인 */
+.tl{position:relative; display:grid; grid-template-columns:repeat(6,1fr); gap:12px; margin-top:6px}
+.tl::before{content:""; position:absolute; left:0; right:0; top:37px; height:3px; background:var(--line)}
+.tli{position:relative}
+.tli .d{display:block; font-size:14px; font-weight:800; color:var(--mint-ink)}
+.tli .pin{display:block; width:14px; height:14px; border-radius:50%; background:var(--mint); margin:12px 0 14px; position:relative; z-index:1; box-shadow:0 0 0 5px var(--mint-soft)}
+.tli h4{font-size:15px; font-weight:800; margin-bottom:4px}
+.tli p{font-size:12.5px; color:var(--ink2); line-height:1.5}
+html.flow .tl{grid-template-columns:1fr} html.flow .tl::before{display:none}
+
+/* 커밋 막대 */
+.bars{display:flex; align-items:flex-end; gap:14px; height:150px; padding-top:8px}
+.bar{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%}
+.bar i{display:block; width:100%; max-width:46px; border-radius:8px 8px 3px 3px; background:linear-gradient(180deg,var(--mint),color-mix(in srgb,var(--mint),transparent 55%));
+  height:0; transition:height 1s cubic-bezier(.2,.7,.2,1)}
+.slide.on .bar i{height:var(--h)}
+.bar b{font-size:14px; margin-bottom:4px}
+.bar span{font-size:12px; color:var(--muted); margin-top:6px}
+.phase{display:grid; grid-template-columns:86px 1fr; gap:10px; padding:8px 0; border-bottom:1px solid var(--line); font-size:13.5px; line-height:1.5}
+.phase:last-child{border-bottom:0}
+.phase .when{font-weight:800; color:var(--mint-ink)}
+.phase .what{color:var(--ink2)}
+.phase .what b{color:var(--ink)}
+
+/* 표 */
+table.tb2{width:100%; border-collapse:collapse; font-size:13.5px}
+.tb2 th{text-align:left; font-size:12px; color:var(--muted); font-weight:800; padding:6px 10px; border-bottom:1px solid var(--line)}
+.tb2 td{padding:9px 10px; border-bottom:1px solid var(--line); color:var(--ink2); vertical-align:top; line-height:1.5}
+.tb2 tr:last-child td{border-bottom:0}
+.tb2 td b{color:var(--ink)}
+.tb2 .arr{color:var(--mint-ink); font-weight:800; width:24px; text-align:center}
+
+/* 데이터 흐름 */
+.flowd{display:grid; grid-template-columns:1.25fr 54px .8fr 54px .8fr; align-items:center; gap:0}
+.src{display:flex; flex-direction:column; gap:8px}
+.src .s{display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:12px; background:var(--surface); border:1px solid var(--line); font-size:13.5px}
+.src .s i{width:8px; height:8px; border-radius:50%; flex:0 0 auto}
+.src .s b{white-space:nowrap}
+.src .s span{color:var(--muted); font-size:12.5px; margin-left:auto; text-align:right}
+.pipe{height:3px; background:var(--line); position:relative; overflow:hidden}
+.pipe::after{content:""; position:absolute; top:-2px; left:-30%; width:30%; height:7px; border-radius:4px; background:var(--mint)}
+.slide.on .pipe::after{animation:flowx 1.8s linear infinite}
+@keyframes flowx{to{left:100%}}
+.hub{padding:18px; border-radius:16px; text-align:center}
+.hub h3{font-size:17px} .hub p{font-size:13px; color:var(--ink2); margin-top:6px; line-height:1.5}
+html.flow .flowd{grid-template-columns:1fr; gap:10px} html.flow .pipe{height:24px; width:3px; margin:0 auto}
+
+/* 숫자 강조 */
+.stat{display:flex; flex-direction:column; gap:6px}
+.stat .big{color:var(--mint-ink)}
+.stat p{font-size:14px; color:var(--ink2); line-height:1.55}
+
+/* 전후 비교 */
+.ba{display:grid; grid-template-columns:1fr 26px 1fr; gap:8px; align-items:center; padding:10px 0; border-bottom:1px solid var(--line)}
+.ba:last-child{border-bottom:0}
+.ba .b4{font-size:13.5px; color:var(--ink2); line-height:1.5}
+.ba .b4 .who{display:block; font-size:11.5px; font-weight:800; color:var(--muted); margin-bottom:2px}
+.ba .af{font-size:13.5px; line-height:1.5; padding:8px 11px; border-radius:10px; background:var(--mint-soft)}
+.ba .af.later{background:var(--surface2)}
+.ba .ar{color:var(--mint-ink); font-weight:800; text-align:center}
+html.flow .ba{grid-template-columns:1fr} html.flow .ba .ar{transform:rotate(90deg)}
+
+/* 화면 흐름 */
+.phones{display:grid; grid-template-columns:repeat(4,1fr); gap:22px; align-items:start}
+.phone{border-radius:26px; border:2px solid var(--line); background:var(--surface); padding:14px 12px; min-height:330px; display:flex; flex-direction:column; gap:8px; position:relative}
+.phone .bar0{height:5px; width:44px; border-radius:3px; background:var(--line); margin:0 auto 6px}
+.phone .ttl{font-size:14px; font-weight:800}
+.ph-row{border-radius:10px; background:var(--surface2); padding:8px 10px; font-size:12px; color:var(--ink2)}
+.ph-row b{color:var(--ink)}
+.ph-btn{border-radius:999px; background:var(--mint); color:var(--on-mint); text-align:center; font-weight:800; font-size:12.5px; padding:9px}
+.phone .cap{position:absolute; left:0; right:0; bottom:-34px; text-align:center; font-size:13px; font-weight:800; color:var(--mint-ink)}
+.runner{width:70px; height:70px; margin:26px auto 4px}
+.runner circle{fill:var(--mint-ink)}
+.runner path{stroke:var(--mint-ink); stroke-width:5; stroke-linecap:round; fill:none}
+.slide.on .runner{animation:bob .5s ease-in-out infinite alternate}
+@keyframes bob{to{transform:translateY(-6px)}}
+html.flow .phones{grid-template-columns:1fr 1fr; gap:36px 14px}
+
+/* 판정 단계 */
+.states{display:grid; grid-template-columns:repeat(5,1fr); gap:12px}
+.state{border-radius:16px; padding:16px 14px; min-height:230px; display:flex; flex-direction:column; gap:6px; background:var(--surface); border:1px solid var(--line)}
+.state .nm{font-size:15px; font-weight:800}
+.state .when{font-size:12px; color:var(--muted); font-weight:700}
+.state .v{font-size:28px; font-weight:800; letter-spacing:-.8px; font-variant-numeric:tabular-nums; margin:8px 0 2px}
+.state .v small{font-size:14px; margin:0 2px}
+.state p{font-size:12.5px; color:var(--ink2); line-height:1.5}
+.state.stop{background:var(--red-soft); border-color:color-mix(in srgb,var(--red),transparent 55%)}
+.state.stop .v{color:var(--red)}
+.state.hold{border:2px dashed #8a86b8}
+.state.hot .v,.state.hot .nm{color:color-mix(in srgb, var(--mint-ink), var(--red) calc(var(--heat)*100%))}
+html.flow .states{grid-template-columns:1fr 1fr}
+
+/* 지도 모형 */
+.mapbox{position:relative; border-radius:16px; overflow:hidden; background:var(--surface2); border:1px solid var(--line); height:100%; min-height:330px}
+.mapbox svg{width:100%; height:100%; display:block}
+.mapbox .m-line{fill:none; stroke-width:6; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:900; stroke-dashoffset:900}
+.slide.on .mapbox .m-line{animation:draw 1.8s .4s ease forwards}
+.slide.on .mapbox .m-line.b2{animation-delay:1.6s}
+.mapbox .m-cas{fill:none; stroke:var(--bg); stroke-width:10; stroke-linecap:round; stroke-linejoin:round; opacity:.8}
+.gpsr{fill:rgba(59,130,246,.35); transform-box:fill-box; transform-origin:center}
+.slide.on .gpsr{animation:pingr 1.8s ease-out infinite}
+@keyframes pingr{from{transform:scale(1); opacity:1} to{transform:scale(3.4); opacity:0}}
+.mlab{opacity:0}
+.slide.on .mlab{animation:up .5s 1.6s both}
+.mtag{position:absolute; white-space:nowrap; background:#fff; color:#0a0a0a; font-size:12px; font-weight:800; border-radius:8px; padding:3px 8px;
+  box-shadow:0 2px 6px rgba(10,10,10,.2); display:inline-flex; align-items:center; gap:5px}
+.mtag i{width:8px; height:8px; border-radius:50%}
+.mtag.x{background:#14133a; color:#fff}
+.gps{position:absolute; width:14px; height:14px; border-radius:50%; background:#3B82F6; border:2.5px solid #fff; box-shadow:0 0 0 0 rgba(59,130,246,.5)}
+.slide.on .gps{animation:ping 1.8s ease-out infinite}
+@keyframes ping{to{box-shadow:0 0 0 16px rgba(59,130,246,0)}}
+.mpos{position:absolute; width:18px; height:18px; border-radius:50%; background:#11705F; border:3px solid #fff; box-shadow:0 2px 6px rgba(10,10,10,.3); offset-rotate:0deg}
+
+/* 구간 레일 모형 */
+.legs{display:flex; flex-direction:column}
+.leg{display:grid; grid-template-columns:20px 1fr auto; gap:12px; padding:11px 0; position:relative}
+.leg .rl{position:relative}
+.leg .rl::before{content:""; position:absolute; left:8px; top:0; bottom:-11px; width:4px; background:var(--lc,#c4c9d0); border-radius:2px}
+.leg.walk .rl::before{background:none; border-left:4px dotted #8a86b8; left:8px; width:0}
+.leg .rl i{position:absolute; left:2px; top:4px; width:16px; height:16px; border-radius:50%; background:var(--bg); border:3px solid var(--lc,#8a86b8)}
+.leg .nm2{display:block; font-size:14px; font-weight:800}
+.leg .sb{display:block; font-size:12.5px; color:var(--muted); margin-top:2px}
+.leg .fx{display:block; width:fit-content; margin-top:6px; font-size:12.5px; font-weight:700; background:var(--surface2); border-radius:8px; padding:3px 9px; color:var(--ink)}
+.leg .fx b{color:var(--mint-ink)}
+.leg .cut{display:block; margin-top:5px; font-size:12px; font-weight:700; color:var(--ink2)}
+.leg .rt{text-align:right; font-size:11.5px; font-weight:700; color:var(--muted)}
+.leg .rt b{display:block; font-size:16px; color:var(--ink); font-variant-numeric:tabular-nums}
+
+/* 걸음 속도 */
+.tempo{display:flex; flex-direction:column; gap:8px}
+.trow{display:grid; grid-template-columns:120px 1fr 56px; gap:10px; align-items:center; font-size:13px}
+.trow .lbl{font-weight:700; color:var(--ink2)}
+.trow .tbar{height:12px; border-radius:6px; background:var(--surface2); overflow:hidden}
+.trow .tbar i{display:block; height:100%; width:0; background:var(--mint); border-radius:6px; transition:width 1s cubic-bezier(.2,.7,.2,1)}
+.slide.on .trow .tbar i{width:var(--w)}
+.trow .tv{font-weight:800; font-variant-numeric:tabular-nums; text-align:right}
+.trow.base .lbl,.trow.base .tv{color:var(--mint-ink)}
+.toast{border-radius:14px; padding:12px 14px; background:var(--surface); border:1.5px solid var(--mint); font-size:14px; font-weight:800; box-shadow:var(--shadow)}
+.toast small{display:block; font-size:12.5px; font-weight:600; color:var(--ink2); margin-top:3px}
+.slide.on .toast.pop{animation:popin 3.6s 1s ease-in-out infinite}
+@keyframes popin{0%,8%{transform:translateY(16px); opacity:0} 16%,82%{transform:none; opacity:1} 92%,100%{transform:translateY(16px); opacity:0}}
+
+/* 다음 단계 */
+.nexts .card{display:flex; flex-direction:column; gap:10px}
+.nexts .now{font-size:13px; color:var(--muted)}
+.nexts .to{font-size:15px; font-weight:800}
+
+/* 마지막 장 */
+.cta{display:inline-flex; align-items:center; gap:12px; padding:18px 30px; border-radius:999px; background:var(--mint); color:var(--on-mint);
+  font-size:22px; font-weight:800; text-decoration:none; box-shadow:0 12px 30px rgba(62,207,178,.35); width:fit-content}
+.cta svg{width:22px; height:22px}
+.slide.on .cta{animation:up .6s .2s both, breathe 2.4s 1s ease-in-out infinite}
+@keyframes breathe{50%{box-shadow:0 12px 40px rgba(62,207,178,.6)}}
+.url{font-size:15px; font-weight:700; color:var(--ink2); margin-top:12px; font-variant-numeric:tabular-nums}
+.qr{width:200px; height:200px; padding:12px; border-radius:16px; background:#fff}
+.qr svg{width:100%; height:100%; display:block}
+.dev{display:flex; gap:10px; flex-wrap:wrap; margin-top:16px}
+.steps{counter-reset:s; display:flex; flex-direction:column; gap:10px}
+.steps li{list-style:none; counter-increment:s; display:grid; grid-template-columns:28px 1fr; gap:10px; font-size:14.5px; line-height:1.5; color:var(--ink2)}
+.steps li::before{content:counter(s); width:26px; height:26px; border-radius:50%; background:var(--mint-soft); color:var(--mint-ink); font-weight:800; display:grid; place-items:center; font-size:13px}
+.steps b{color:var(--ink)}
+.foot{margin-top:auto; padding-top:14px; font-size:12px; color:var(--muted)}
+html.flow .foot{position:static; margin-top:16px}
+</style>
+</head>
+<body>
+<div class="sky" aria-hidden="true">
+  <svg viewBox="0 0 480 120" preserveAspectRatio="xMidYMax slice">
+    <path fill="#1d1a4d" d="M0 120V78h18V64h14v-8h10v8h12V70h16V48h6v-6h8v6h6v22h14V58h20v20h10V40h4v-8h4v8h4v38h12V62h18v-12h10v12h8v16h16V54h22v24h8V66h12v-10h14v10h6v12h18V44h8v-10h6v10h8v34h12V60h16v18h10V70h14V52h20v26h8V62h16v16h18V68h14v52z"/>
+    <path fill="#141239" d="M0 120V96h26V86h20v10h18V80h22v16h16V88h28v8h14V76h12v20h22V90h18v6h24V82h20v14h16V92h22v4h18V78h14v18h20V88h26v8h18V84h16v12h22V90h24v30z"/>
+    <g fill="#F6D58E" opacity=".55"><rect x="78" y="56" width="3" height="4"/><rect x="152" y="46" width="3" height="4"/><rect x="152" y="60" width="3" height="4"/><rect x="236" y="62" width="3" height="4"/><rect x="315" y="44" width="3" height="4"/><rect x="398" y="60" width="3" height="4"/><rect x="26" y="70" width="3" height="4"/></g>
+  </svg>
+</div>
+<div class="topr">
+  <a class="tb" href="https://rnjswldnjs.github.io/lastrain/" target="_blank" rel="noopener"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M8 4H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-3M11 4h5v5M16 4l-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>데모 열기</a>
+  <button class="tb" id="themeBtn" type="button" aria-label="밝은 화면으로"></button>
+</div>
+
+<main class="stage" id="stage">
+
+<!-- 1. 표지 -->
+<section class="slide cover" data-title="표지">
+  <p class="eyebrow" data-a>혁신기업경영 캡스톤디자인 II   중간 산출물</p>
+  <h1 class="t" data-a>라스트<span>레인</span> LastTrain</h1>
+  <p class="lead" data-a style="font-size:21px">심야 환승 귀갓길, 지금 나가면 막차를 탈 수 있는지 한 화면에서</p>
+  <div class="rail" data-a aria-hidden="true">
+    <svg viewBox="0 0 760 46"><path class="ln" d="M20 23 H740"/>
+      <circle class="st" cx="20" cy="23" r="9"/><circle class="st" cx="260" cy="23" r="9"/><circle class="st" cx="500" cy="23" r="9"/><circle class="st" cx="740" cy="23" r="9"/>
+      <rect class="tr" x="8" y="15" width="40" height="16" rx="8"/></svg>
+  </div>
+  <div class="members" data-a>
+    <span><b>Team 04</b></span><span>방강희 2223014</span><span>이수민 2376201</span><span>권지원 2385005</span><span>김나영 2276039</span><span>고유민 2421011</span>
+  </div>
+  <p class="small" data-a style="margin-top:12px">2026. 11. 10</p>
+</section>
+
+<!-- 2. 목차 -->
+<section class="slide toc" data-title="목차">
+  <p class="eyebrow" data-a>Contents</p>
+  <h2 class="t" data-a>문제에서 시작해 두 번의 테스트를 거쳐 지금의 데모까지</h2>
+  <div class="body">
+    <div class="g4">
+      <div class="card" data-a><span class="n">01</span><h3>개요</h3><p>문제 정의<br>해결 방식<br>핵심 로직 역산</p></div>
+      <div class="card" data-a><span class="n">02</span><h3>구현 과정</h3><p>타임라인과 개발 로그<br>사용자 조사<br>개발, 검증, 피드백 반영</p></div>
+      <div class="card" data-a><span class="n">03</span><h3>기능</h3><p>화면 흐름과 판정 단계<br>지도, 빠른 환승, 출구<br>개인화와 이동 중 안내</p></div>
+      <div class="card" data-a><span class="n">04</span><h3>직접 써보기</h3><p>한계와 다음 단계<br>데모 바로가기<br>모바일, PC 모두 가능</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 3. 문제 -->
+<section class="slide" data-title="문제">
+  <p class="eyebrow" data-a>01 개요   문제</p>
+  <h2 class="t" data-a>막차 정보는 이미 앱에 있다.<br>없는 건 구간 사이의 <span class="hl">연결 판정</span></h2>
+  <p class="lead" data-a>지도 앱과 지하철 앱을 번갈아 보며 도보시간까지 더해 직접 계산. 그 계산을 이동 중이나 모임 중처럼 확인하기 어려운 상황에서 반복</p>
+  <div class="body">
+    <div class="moments">
+      <div class="moment" data-a><span class="i">1</span><h4>일정 종료 직전</h4><p>언제 자리에서 일어나야 하는지 계산</p></div>
+      <div class="moment" data-a><span class="i">2</span><h4>출발 판단</h4><p>지금 나가면 되는지, 이미 늦었는지</p></div>
+      <div class="moment" data-a><span class="i">3</span><h4>이동 중</h4><p>걸으면서 앱을 오가며 다시 확인</p></div>
+      <div class="moment" data-a><span class="i">4</span><h4>환승 지점</h4><p>다음 노선 막차에 닿는지 판단</p></div>
+    </div>
+    <div class="g73">
+      <div class="card" data-a><span class="k">10/3 문제 인터뷰 5명</span>
+        <p class="quote">발목 깁스한 상태인데, 내 이동시간과 지도 앱에 나온 도보 소요 시간이 차이가 많이 나서 막차를 놓쳤다.</p></div>
+      <div class="card" data-a><span class="k">인터뷰에서 나온 세 가지</span>
+        <ul><li>이동 중 조작 위험</li><li>확인 자체의 사회적 비용 (모임 중 휴대폰 확인)</li><li>지도 앱의 일률적 도보시간</li></ul>
+        <p class="small" style="margin-top:10px">가정 변화: 정보 탐색이 복잡하다 → 정보는 있지만 판단에 드는 인지 비용이 크다</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 4. 해결 -->
+<section class="slide" data-title="해결">
+  <p class="eyebrow" data-a>01 개요   해결</p>
+  <h2 class="t" data-a>라스트레인이 대신 계산해 주는 세 가지</h2>
+  <p class="lead" data-a>대상: 늦은 일정이 잦고 2회 이상 환승해 귀가하는 대학생 (이대, 신촌 생활권)</p>
+  <div class="body">
+    <div class="g73" style="align-items:stretch">
+      <div style="display:flex; flex-direction:column; gap:12px">
+        <div class="card" data-a><span class="k">1</span><h3>지금 나가면 탈 수 있는가</h3><p>구간별 막차와 소요시간, 내 걸음으로 이어 붙인 판정</p></div>
+        <div class="card" data-a><span class="k">2</span><h3>최종 출발 마감시각</h3><p>기존 지도 앱이 주지 않는 숫자. 늦어도 몇 시에는 출발해야 하는지</p></div>
+        <div class="card" data-a><span class="k">3</span><h3>끊기는 구간과 원인</h3><p>어느 역에서 끊기는지, 어느 노선 막차가 마감을 정하는지</p></div>
+      </div>
+      <div class="vmock glow" data-a style="--heat:.35; align-self:center">
+        <p class="call">23:10에 출발하면 빠듯해요</p>
+        <p class="lab">23:10 출발 기준 여유</p>
+        <p class="hero">3<small>분</small></p>
+        <p class="meta"><b>23:13</b>까지 출발   스타벅스 몬테소리점 → 수원역</p>
+        <p class="why">오늘 마감은 수인분당선 정자역 막차 <b>23:38</b> 기준이에요</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5. 역산 -->
+<section class="slide" data-title="핵심 로직">
+  <p class="eyebrow" data-a>01 개요   핵심 로직</p>
+  <h2 class="t" data-a>도착지에서 거꾸로 올라오는 <span class="hl">역산</span></h2>
+  <p class="lead" data-a>각 구간을 "늦어도 몇 시에 시작해야 하는가"로 바꿔 맨 앞까지 오면 그게 최종 출발 마감시각. 규칙 기반이라 결과가 재현되고 근거를 그대로 펼쳐 볼 수 있음</p>
+  <div class="body" style="justify-content:center">
+    <div class="chain">
+      <div class="cstep dead" data-a style="--d:1500ms"><span class="time">23:13</span><span class="what"><b>최종 출발 마감</b><br>스타벅스 몬테소리점</span><span class="node"></span><span class="arrowlab">도보 5분</span></div>
+      <div class="cstep" data-a style="--d:1050ms"><span class="time">23:18</span><span class="what">신분당선 강남역<br>탑승 마감</span><span class="node"></span><span class="arrowlab">신분당선 17분</span></div>
+      <div class="cstep" data-a style="--d:600ms"><span class="time">23:35</span><span class="what">정자역 환승<br>도보 시작</span><span class="node"></span><span class="arrowlab">환승 도보 3분</span></div>
+      <div class="cstep end" data-a style="--d:150ms"><span class="time">23:38</span><span class="what">수인분당선 정자역<br>막차</span><span class="node"></span><span class="arrowlab">여기서 시작</span></div>
+    </div>
+    <div class="g2" style="margin-top:22px">
+      <div class="card" data-a style="--d:1500ms"><span class="k">병목 구간 찾기</span><p>신분당선 노선 막차는 <b>00:27</b>이지만, 뒤 구간 막차(23:38)에 맞추려면 <b>69분 이른 23:18</b>에 타야 함. 이렇게 앞당겨지는 구간을 "마감을 정하는 구간"으로 표시</p></div>
+      <div class="card" data-a style="--d:1500ms"><span class="k">걸음 속도 반영</span><p>도보 구간에만 개인 배율을 곱함. 같은 경로라도 보통 걸음 23:13, 빠름 23:15, 많이 느림 23:07</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 6. 타임라인 -->
+<section class="slide" data-title="타임라인">
+  <p class="eyebrow" data-a>02 구현 과정   타임라인</p>
+  <h2 class="t" data-a>제안서 이후 한 달, 두 번의 테스트와 세 번의 큰 개선</h2>
+  <div class="body" style="justify-content:center">
+    <div class="tl">
+      <div class="tli" data-a><span class="d">9/22 ~ 10/6</span><span class="pin"></span><h4>문제 탐색과 제안</h4><p>인터뷰 5명, 전환 의향 5명. 경로 검색을 걷어내는 피벗</p></div>
+      <div class="tli" data-a><span class="d">10/13</span><span class="pin"></span><h4>v0.1 판정 엔진</h4><p>역산 알고리즘, 걸음 배율, 판정 근거</p></div>
+      <div class="tli" data-a><span class="d">10/23 ~ 10/24</span><span class="pin"></span><h4>실제 경로 11개</h4><p>조원 경로 조사 반영, v0.2 ~ v1.0 화면 완성</p></div>
+      <div class="tli" data-a><span class="d">10/25 ~ 10/30</span><span class="pin"></span><h4>1차 테스트 → v1.1</h4><p>공공데이터 막차 대조, 다크 테마, 택시 대안</p></div>
+      <div class="tli" data-a><span class="d">11/3 ~ 11/5</span><span class="pin"></span><h4>v1.2 지도</h4><p>선로 모양 수집, 카카오 지도, 빠른 환승, 2차 테스트</p></div>
+      <div class="tli" data-a><span class="d">11/6</span><span class="pin"></span><h4>v1.3</h4><p>가까운 출구, 현재 위치 출발지, 지정 시각 표현</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 7. 개발 로그 -->
+<section class="slide" data-title="개발 로그">
+  <p class="eyebrow" data-a>02 구현 과정   GitHub 개발 로그</p>
+  <h2 class="t" data-a>커밋 <span class="hl num" data-count="32">32</span>개, 버전 <span class="hl num" data-count="14">14</span>개 (v0.1 → v1.3)</h2>
+  <p class="lead" data-a>저장소 rnjswldnjs/lastrain. 버전마다 무엇을 왜 바꿨는지 변경 로그로 기록</p>
+  <div class="body">
+    <div class="g73">
+      <div class="card" data-a><span class="k">날짜별 커밋 수</span>
+        <div class="bars">
+          <div class="bar"><b>2</b><i style="--h:20%"></i><span>10/13</span></div>
+          <div class="bar"><b>10</b><i style="--h:100%"></i><span>10/24</span></div>
+          <div class="bar"><b>4</b><i style="--h:40%"></i><span>10/30</span></div>
+          <div class="bar"><b>5</b><i style="--h:50%"></i><span>11/3</span></div>
+          <div class="bar"><b>7</b><i style="--h:70%"></i><span>11/5</span></div>
+          <div class="bar"><b>4</b><i style="--h:40%"></i><span>11/6</span></div>
+        </div>
+      </div>
+      <div class="card" data-a>
+        <div class="phase"><span class="when">판정 엔진</span><span class="what"><b>v0.1</b> 역산으로 마감시각, 끊기는 구간, 원인 구간 산출</span></div>
+        <div class="phase"><span class="when">화면</span><span class="what"><b>v0.2 ~ v1.0</b> 실제 경로 11개, UI 점검 2회(25 → 26점/40), 검색형 진입, 카운트다운, 출발했어요 모드</span></div>
+        <div class="phase"><span class="when">데이터</span><span class="what"><b>v1.1</b> 코랩 수집 노트북, 공공데이터 막차 대조, 택시 대안</span></div>
+        <div class="phase"><span class="when">지도</span><span class="what"><b>v1.2</b> 선로 21구간, 버스 5구간, 빠른 환승, 내 위치</span></div>
+        <div class="phase"><span class="when">2차 반영</span><span class="what"><b>v1.3</b> 가까운 출구, 좌표 OSM 교체</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 8. 사용자 조사 -->
+<section class="slide" data-title="사용자 조사">
+  <p class="eyebrow" data-a>02 구현 과정   사용자 조사</p>
+  <h2 class="t" data-a>세 번의 조사로 문제와 데이터를 확보</h2>
+  <div class="body">
+    <div class="g3">
+      <div class="card" data-a><span class="k">10/3 문제 인터뷰</span><div class="big num"><span data-count="5">5</span><small>명</small></div>
+        <ul style="margin-top:12px"><li>최근 1개월 2회 이상 막차 귀가 경험</li><li>늦은 일정이 주 1회 이상 반복</li></ul></div>
+      <div class="card" data-a><span class="k">10/4 전환 의향</span><div class="big num"><span data-count="4">4</span><small>/ 5명</small></div>
+        <ul style="margin-top:12px"><li>기존 지도 앱 주 사용자 대상</li><li>"막차 판단이 필요할 때 먼저 열겠다" 응답, 성공 기준 3명 이상 충족</li></ul></div>
+      <div class="card" data-a><span class="k">10/23 실제 경로 조사 (이수민, 김나영)</span><div class="big num"><span data-count="11">11</span><small>개 경로</small></div>
+        <ul style="margin-top:12px"><li>구간별 소요시간, 도보시간</li><li>평일, 토요일, 일요일 막차 시각</li><li>지도 앱 화면 캡처로 근거 확보</li></ul></div>
+    </div>
+    <div class="card" data-a><span class="k">조사한 11개 경로</span>
+      <p style="font-size:13px; line-height:1.9">스타벅스 몬테소리점 → 수원역 / 스타벅스 홍대공항철도역점 → 대화역 / 건국대 상허기념도서관 → 평내호평역 / 연세대 중앙도서관 → 부평역 / 방송통신대 대학본부 → 의정부역 / KB국민은행 사당동센터 → 수지구청역 / IFC서울 → 운양역 / 숭실대입구역 → 동탄역 / 동국대 중앙도서관 → 운정역 / 서울대 관정도서관 → 한대앞역 / 서울대 행정관 → 범계역</p></div>
+  </div>
+</section>
+
+<!-- 9. 조사 → 설계 -->
+<section class="slide" data-title="조사에서 설계로">
+  <p class="eyebrow" data-a>02 구현 과정   조사 결과를 설계로</p>
+  <h2 class="t" data-a>조사에서 나온 사실이 그대로 기능이 됨</h2>
+  <div class="body">
+    <div class="card" data-a style="padding:8px 20px">
+      <table class="tb2">
+        <tr><th>조사에서 확인한 것</th><th></th><th>설계 결정</th><th>화면</th></tr>
+        <tr data-a><td><b>지도 앱 도보시간이 내 걸음과 다름</b><br>깁스, 짐이 있을 때 차이가 커짐</td><td class="arr">→</td><td>도보 구간에 개인 배율 5단계<br>(많이 느림 1.8배 ~ 빠름 0.75배)</td><td>걸음 속도 선택, "보통 걸음보다 6분 일찍"</td></tr>
+        <tr data-a><td><b>이동 중 조작 위험, 모임 중 확인 부담</b></td><td class="arr">→</td><td>경로 검색 대신 한 화면 판정과 원터치 카운트다운</td><td>"출발까지 남은 시간 8분 00초"</td></tr>
+        <tr data-a><td><b>앱마다 막차만 따로 보여 줌</b><br>구간 사이 연결은 직접 계산</td><td class="arr">→</td><td>역산으로 연결 판정, 마감을 정하는 구간 표시</td><td>"오늘 마감은 ... 막차 기준이에요"</td></tr>
+        <tr data-a><td><b>버스 시간표와 실제 운행 차이 −10 ~ +92분</b><br>카카오맵 시간표와 예측 대조 5건</td><td class="arr">→</td><td>일정하지 않아 보정하지 않음. 버스가 마감을 정하면 표시</td><td>"버스 시간표 기준, 실제와 다를 수 있음"</td></tr>
+        <tr data-a><td><b>막차 시각이 비어 있는 구간 존재</b></td><td class="arr">→</td><td>지어내지 않고 판정 보류</td><td>"아직 판정할 수 없어요, 5511 버스"</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- 10. 데이터 흐름 -->
+<section class="slide" data-title="개발 데이터">
+  <p class="eyebrow" data-a>02 구현 과정   개발</p>
+  <h2 class="t" data-a>조원 조사 + 공공데이터를 코랩에서 모아 웹 하나로</h2>
+  <div class="body">
+    <div class="flowd">
+      <div class="src">
+        <div class="s" data-a><i style="background:#3ECFB2"></i><b>조원 경로 조사</b><span>경로 11개, 소요시간, 막차</span></div>
+        <div class="s" data-a><i style="background:#00A84D"></i><b>서울 열린데이터광장</b><span>1 ~ 9호선 역별 시간표</span></div>
+        <div class="s" data-a><i style="background:#9A6292"></i><b>국토부 TAGO</b><span>GTX-A, 김포골드라인, 신림선 등 시간표, 인천 버스</span></div>
+        <div class="s" data-a><i style="background:#5BB025"></i><b>서울, 경기 버스 API</b><span>정류장 좌표, 막차, 도로 경로</span></div>
+        <div class="s" data-a><i style="background:#93C5FD"></i><b>OpenStreetMap</b><span>선로 모양 21구간, 역 출구, 좌표</span></div>
+        <div class="s" data-a><i style="background:#F6D58E"></i><b>국토부 빠른 환승 정보</b><span>환승 7곳 칸, 문 번호</span></div>
+      </div>
+      <div class="pipe" data-a></div>
+      <div class="hub glow" data-a><h3>코랩 수집 노트북</h3><p>셀 단위로 돌려 결과 확인<br>키는 보안 비밀에만 보관</p></div>
+      <div class="pipe" data-a></div>
+      <div class="hub card" data-a><h3>웹 데모 하나</h3><p>수집 결과를 고정 데이터로<br>GitHub Pages 배포<br>카카오 지도는 화면 표시만</p></div>
+    </div>
+    <div class="g3">
+      <div class="card" data-a style="padding:12px 16px"><span class="k">원칙 1</span><p>막차는 조사나 공식 시간표로 확인된 값만</p></div>
+      <div class="card" data-a style="padding:12px 16px"><span class="k">원칙 2</span><p>조사값과 시간표가 다르면 더 이른 값 (놓치는 쪽 오류 방지)</p></div>
+      <div class="card" data-a style="padding:12px 16px"><span class="k">원칙 3</span><p>모르는 값은 지어내지 않고 판정 보류</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 11. 개발 중 판단 -->
+<section class="slide" data-title="개발 중 판단">
+  <p class="eyebrow" data-a>02 구현 과정   개발 중 판단</p>
+  <h2 class="t" data-a>막힐 때마다 비용 없이, 더 안전한 쪽으로</h2>
+  <div class="body">
+    <div class="card" data-a style="padding:8px 20px">
+      <table class="tb2">
+        <tr><th>부딪힌 문제</th><th></th><th>판단</th></tr>
+        <tr data-a><td><b>ODsay 경로 API 무료 한도 하루 30건</b><br>수집 도중 한도 초과</td><td class="arr">→</td><td>유료 전환 대신 공공데이터 API로 전면 교체. 모두 무료</td></tr>
+        <tr data-a><td><b>9호선 막차가 김포공항까지 가지 않음</b><br>시간표상 막차가 중간역에서 끝남</td><td class="arr">→</td><td>탑승역과 하차역 시간표를 열차번호로 맞춰, 실제로 도착하는 열차만 막차로 인정</td></tr>
+        <tr data-a><td><b>조사값과 공식 시간표 불일치</b><br>김포골드라인 조사 00:29, 시간표 23:29</td><td class="arr">→</td><td>더 이른 23:29 채택. 이 경로 평일 마감 23:57 → 22:57로 수정</td></tr>
+        <tr data-a><td><b>택시 예상 요금에 심야 할증 미반영</b></td><td class="arr">→</td><td>서울 중형택시 심야 할증 40%를 더해 추정. 시계외 할증 제외를 화면에 명시</td></tr>
+        <tr data-a><td><b>카카오 API 응답은 저장해서 쓰면 안 됨</b> (카카오 운영 정책)</td><td class="arr">→</td><td>출발지, 도착지 좌표를 OpenStreetMap으로 교체. 카카오는 실시간 지도 표시에만 사용</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- 12. 검증 -->
+<section class="slide" data-title="검증">
+  <p class="eyebrow" data-a>02 구현 과정   검증</p>
+  <h2 class="t" data-a>조사값을 공식 시간표로 다시 확인</h2>
+  <div class="body">
+    <div class="g3">
+      <div class="card stat" data-a><span class="k">서울 열린데이터광장 대조</span><div class="big"><span data-count="8">8</span><small>/ 13구간</small></div><p>조사값과 공식 시간표가 0분 차이로 일치. 1구간은 1분, 4구간은 차이가 있어 더 이른 값 사용</p></div>
+      <div class="card stat" data-a><span class="k">지도 앱 실제 출발시각 대조</span><div class="big"><span data-count="6">6</span><small>/ 9건</small></div><p>역산 마감시각이 지도 앱이 짠 실제 출발시각과 5분 이내 (v0.2 검증)</p></div>
+      <div class="card stat" data-a><span class="k">토요일, 일요일 막차</span><div class="big"><span data-count="10">10</span><small>/ 11경로</small></div><p>조사 당시 6개 경로만 있던 주말 막차를 공공데이터로 채움. 남은 1곳은 5511 버스(판정 보류)</p></div>
+    </div>
+    <div class="g2">
+      <div class="card" data-a><span class="k">놓치는 쪽 오류를 잡은 사례</span><p>4호선 사당 → 한대앞은 조사 00:20, 시간표 23:42. 열차번호로 대조하니 00:20 열차는 한대앞까지 가지 않음. 한대앞까지 가는 열차 기준으로 수정</p></div>
+      <div class="card" data-a><span class="k">토요일 시간표가 없는 노선</span><p>국토부 TAGO에 토요일 값이 없는 김포골드라인, GTX-A, 신림선은 일요일 시간표 기준임을 화면에 표시</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 13. 1차 테스트 -->
+<section class="slide" data-title="1차 테스트">
+  <p class="eyebrow" data-a>02 구현 과정   1차 테스트 → v1.1</p>
+  <h2 class="t" data-a>10/25 1차 테스트: 계산은 일관적, 표현이 모호</h2>
+  <p class="lead" data-a>테스트 고유민, 방강희 (v1.0). 보행속도, 출발시각, 마감 전후 판정, 설정 화면, 다른 경로 5항목 모두 화면 값끼리 일관적</p>
+  <div class="body">
+    <div class="card" data-a style="padding:6px 20px">
+      <div class="ba" data-a><p class="b4"><span class="who">피드백</span>구간별 "도착 예상 23:22"가 어느 역 도착인지 모호</p><span class="ar">→</span><p class="af">역 이름을 붙여 <b>"강남역 도착 23:07"</b></p></div>
+      <div class="ba" data-a><p class="b4"><span class="who">피드백</span>미래 시각을 지정해도 "지금 나가면"</p><span class="ar">→</span><p class="af"><b>"23:10에 출발하면 빠듯해요"</b>처럼 조건 명시</p></div>
+      <div class="ba" data-a><p class="b4"><span class="who">피드백</span>노선 막차와 탑승 마감이 같이 보여 헷갈림</p><span class="ar">→</span><p class="af"><b>"노선 막차 00:27"</b>과 <b>"탑승 마감까지"</b>로 구분, "69분 이른 23:18에 타야" 설명 줄</p></div>
+      <div class="ba" data-a><p class="b4"><span class="who">피드백</span>여유 1분을 보장처럼 받아들일 수 있음</p><span class="ar">→</span><p class="af">여유 3분 미만이면 <b>"지연되면 놓칠 수 있어요"</b></p></div>
+      <div class="ba" data-a><p class="b4"><span class="who">기획 대비 미확인</span>택시 대안, 지도 앱 연결, 근거 노출</p><span class="ar">→</span><p class="af">택시 대안, 카카오맵, 네이버 지도 연결, <b>"자세히 보기"</b> 역산 표 추가</p></div>
+      <div class="ba" data-a><p class="b4"><span class="who">디자인 의견 (김나영)</span>어두운 톤의 참고 화면 공유</p><span class="ar">→</span><p class="af">밤하늘 다크 테마 기본, 밝은 화면 전환 버튼</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 14. 2차 테스트 -->
+<section class="slide" data-title="2차 테스트">
+  <p class="eyebrow" data-a>02 구현 과정   2차 테스트 → v1.3</p>
+  <h2 class="t" data-a>11/5 2차 테스트: 1차 지적은 해결, 새 요청 4개</h2>
+  <div class="body">
+    <div class="g4">
+      <div class="card" data-a style="padding:12px 14px"><span class="k">확인</span><p>GPS로 현재 위치가 지도에 표시</p></div>
+      <div class="card" data-a style="padding:12px 14px"><span class="k">확인</span><p>"정자역 환승, 빠른 환승 5-1"이 지도와 구간에 일관되게 표시</p></div>
+      <div class="card" data-a style="padding:12px 14px"><span class="k">확인</span><p>걸음 보통 → 빠름, 마감 23:13 → 23:15. 도보 5분 → 4분, 3분 → 2분</p></div>
+      <div class="card" data-a style="padding:12px 14px"><span class="k">확인</span><p>아이폰, 아이패드 화면 배율 양호. 1차보다 한눈에 파악하기 쉬움</p></div>
+    </div>
+    <div class="card" data-a style="padding:6px 20px">
+      <div class="ba" data-a><p class="b4"><span class="who">요청</span>출발지에서 가장 가까운 지하철 출구 안내</p><span class="ar">→</span><p class="af">반영. <b>"강남역 9번 출구가 가장 가까워요"</b> (직선거리 기준), 지도에 출구 표시</p></div>
+      <div class="ba" data-a><p class="b4"><span class="who">요청</span>현재 위치를 출발지로 바로 설정</p><span class="ar">→</span><p class="af">반영. 1.5km 안의 조사된 출발지를 자동 선택, 없으면 가까운 순 정렬</p></div>
+      <div class="ba" data-a><p class="b4"><span class="who">요청</span>지정 시각의 "출발까지 남은 시간"이 실제 카운트다운처럼 보임</p><span class="ar">→</span><p class="af">반영. <b>"23:10 출발 기준 3분 여유"</b>, 초 단위 카운트다운은 실시간일 때만</p></div>
+      <div class="ba" data-a><p class="b4"><span class="who">요청</span>최근 3 ~ 5일 버스 실제 막차 시간대</p><span class="ar">→</span><p class="af later">기말 반영. 공공데이터에 운행 기록이 없어 매일 밤 자동 수집 체계가 먼저 필요</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 15. 화면 흐름 -->
+<section class="slide" data-title="화면 흐름">
+  <p class="eyebrow" data-a>03 기능   화면 흐름</p>
+  <h2 class="t" data-a>고르고, 확인하고, 출발한다</h2>
+  <div class="body" style="padding-bottom:30px">
+    <div class="phones">
+      <div class="phone" data-a><span class="bar0"></span><p class="ttl">어디로 가세요?</p>
+        <div class="ph-row">출발 <b>스타벅스 몬테소리점</b></div><div class="ph-row">도착 <b>수원역</b></div>
+        <div class="ph-row">현재 위치에서 가까운 출발지 찾기</div><div class="ph-row">출발 <b>11/10 (화) 23:10</b></div><div class="ph-row">걸음 <b>보통</b></div>
+        <div class="ph-btn" style="margin-top:auto">막차 확인</div><span class="cap">1 홈</span></div>
+      <div class="phone" data-a><span class="bar0"></span>
+        <svg class="runner" viewBox="0 0 70 70" aria-hidden="true"><circle cx="40" cy="12" r="7"/><path d="M38 21 L32 40 M32 40 L42 52 L40 64 M32 40 L22 50 L14 52 M36 26 L46 34 L54 32 M36 26 L26 30 L22 38"/></svg>
+        <p class="ttl" style="text-align:center">막차 확인 중</p>
+        <div class="ph-row" style="margin-top:12px"><b>팁</b> 걸음 속도를 바꾸면 마감이 움직여요</div><span class="cap">2 로딩</span></div>
+      <div class="phone" data-a><span class="bar0"></span>
+        <div class="vmock glow" style="--heat:.35; padding:12px"><p class="call" style="font-size:13px">23:10에 출발하면 빠듯해요</p><p class="hero" style="font-size:34px">3<small style="font-size:14px">분</small></p><p class="meta" style="font-size:11.5px">23:13까지 출발</p></div>
+        <div class="ph-row">지도 카드</div><div class="ph-row">구간별 연결 5구간</div><div class="ph-btn" style="margin-top:auto">예상 이동 경로 보기</div><span class="cap">3 결과</span></div>
+      <div class="phone" data-a><span class="bar0"></span>
+        <div class="ph-row" style="border:1.5px solid var(--mint)"><b>신분당선 타고 정자역으로 가는 중</b></div>
+        <div class="ph-row">지도가 지금 구간을 따라감</div><div class="ph-row">약 2개역 남음</div>
+        <div class="toast" style="margin-top:auto; font-size:12px">다음은 정자역이에요<small>내릴 준비하세요</small></div><span class="cap">4 경로 보기</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 16. 판정 단계 -->
+<section class="slide" data-title="판정 단계">
+  <p class="eyebrow" data-a>03 기능   판정</p>
+  <h2 class="t" data-a>남은 시간에 따라 다섯 가지로 말해 줌</h2>
+  <p class="lead" data-a>마감 10분 전부터 테두리와 숫자가 민트에서 빨강으로 서서히 물듦</p>
+  <div class="body">
+    <div class="states">
+      <div class="state glow" data-a><span class="nm">여유</span><span class="when">3시간 넘게 남음</span><span class="v">23:13</span><p>최종 출발 마감시각만 크게</p></div>
+      <div class="state glow" data-a><span class="nm">계획</span><span class="when">1 ~ 3시간</span><span class="v">23:13</span><p>마감시각과 남은 시간</p></div>
+      <div class="state glow hot" id="hotCard" data-a><span class="nm">임박</span><span class="when">1시간 이내</span><span class="v" id="hotV">9<small>분</small>59<small>초</small></span><p>분, 초 카운트다운. 아래로 스크롤해도 상단 배너로 따라옴</p></div>
+      <div class="state stop" data-a><span class="nm">끊김</span><span class="when">마감 지남</span><span class="v" style="font-size:20px">정자역에서<br>끊겨요</span><p>택시라면 약 59,400원, 37분 (심야 할증 반영 추정)</p></div>
+      <div class="state hold" data-a><span class="nm">판정 보류</span><span class="when">막차 모름</span><span class="v" style="font-size:20px">5511 버스</span><p>모르는 값은 지어내지 않음. 확인된 앞 구간까지만 부분 판정</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 17. 지도 (권지원 아이디어) -->
+<section class="slide" data-title="지도">
+  <p class="eyebrow" data-a>03 기능   지도</p>
+  <h2 class="t" data-a>지도 앱으로 넘어가지 않아도 되게</h2>
+  <p data-a style="margin-top:10px"><span class="idea"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 2.5a5 5 0 0 0-3 9v2h6v-2a5 5 0 0 0-3-9zM8 16.5h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>지도, GPS 아이디어 권지원 (개발 담당)</span> <span class="small" style="margin-left:6px">카카오맵 길 안내를 쓰다가 "우리 화면 안에서 지도를 보면 더 정확하겠다"는 제안</span></p>
+  <div class="body">
+    <div class="g73" style="flex:1; min-height:0">
+      <div class="mapbox" data-a>
+        <svg viewBox="0 0 300 360" preserveAspectRatio="xMidYMid meet" aria-label="스타벅스 몬테소리점에서 수원역까지 지도">
+          <path class="m-cas" d="M120.8 25.4 L121.5 27.1 L122.6 30.2 L123.6 32.8 L124.6 35.4 L125.5 37.8 L126.6 40.6 L127.4 41.8 L128.7 43.3 L129.7 44.6 L130.3 45.4 L130.7 46.4 L131.1 47.6 L131.2 48.9 L131.1 51.4 L130.9 52.6 L130.8 54.0 L130.9 57.6 L131.4 63.5 L133.4 66.4 L144.0 81.4 L146.9 85.5 L154.1 96.7 L166.9 112.9 L174.5 120.3 L182.9 126.4 L199.8 136.8 L201.0 137.8 L201.8 139.0 L202.3 141.1 L202.4 142.3 L202.4 150.9 L202.4 151.7 L202.5 156.0 L202.5 164.5 L202.4 165.4 L200.5 170.8 L199.9 173.3 L199.7 175.0 L199.7 185.5 L199.7 185.5"/><path class="m-cas" d="M199.5 187.0 L199.5 188.3 L199.6 197.0 L200.1 200.4 L200.2 201.5 L200.3 205.1 L200.3 208.4 L200.3 214.7 L200.3 216.4 L200.3 221.0 L200.3 222.3 L200.3 223.5 L200.5 225.0 L200.4 226.2 L200.3 227.0 L199.9 228.3 L199.5 229.5 L199.0 230.5 L198.9 231.6 L198.8 233.0 L198.8 234.0 L198.8 236.5 L198.8 238.4 L198.7 239.8 L198.7 241.0 L198.7 241.9 L198.6 243.2 L198.6 246.1 L198.6 247.1 L198.9 249.0 L199.3 251.0 L199.7 253.4 L199.8 255.6 L199.8 256.4 L199.6 257.3 L199.0 258.2 L197.8 259.6 L197.4 260.4 L197.3 263.0 L197.2 264.5 L197.1 271.6 L197.3 277.3 L197.8 279.4 L198.6 281.1 L200.9 283.9 L203.3 286.5 L206.2 289.5 L206.7 290.1 L207.1 291.1 L207.1 292.5 L207.2 294.9 L207.2 297.4 L207.2 299.6 L207.2 301.6 L207.3 308.6 L207.2 312.4 L206.4 314.0 L205.4 315.1 L203.5 315.8 L200.2 316.0 L195.5 316.4 L192.4 316.6 L189.9 316.8 L185.2 317.2 L183.2 317.1 L177.6 315.8 L176.2 315.6 L174.6 315.7 L173.2 316.1 L171.9 317.4 L170.7 319.0 L167.7 323.0 L163.9 328.0 L159.6 333.8 L159.0 334.5 L158.3 335.0 L157.6 335.4 L156.6 335.6 L151.6 335.8 L147.9 335.9 L144.6 336.0 L143.4 335.9 L142.8 335.6 L134.3 328.6 L133.8 327.9 L133.0 326.7 L132.0 324.7 L131.4 324.1 L130.3 323.1 L129.5 322.3 L129.1 321.4 L128.7 319.4 L128.5 318.5 L128.0 317.5 L127.4 316.9 L124.7 315.9 L116.4 313.4 L112.7 312.3 L108.8 311.3 L105.4 310.3 L104.0 309.5 L102.1 308.4 L100.9 308.1 L99.4 307.9 L95.1 309.7 L92.7 310.9 L92.7 310.9"/>
+          <path class="m-line" stroke="#D4003B" d="M120.8 25.4 L121.5 27.1 L122.6 30.2 L123.6 32.8 L124.6 35.4 L125.5 37.8 L126.6 40.6 L127.4 41.8 L128.7 43.3 L129.7 44.6 L130.3 45.4 L130.7 46.4 L131.1 47.6 L131.2 48.9 L131.1 51.4 L130.9 52.6 L130.8 54.0 L130.9 57.6 L131.4 63.5 L133.4 66.4 L144.0 81.4 L146.9 85.5 L154.1 96.7 L166.9 112.9 L174.5 120.3 L182.9 126.4 L199.8 136.8 L201.0 137.8 L201.8 139.0 L202.3 141.1 L202.4 142.3 L202.4 150.9 L202.4 151.7 L202.5 156.0 L202.5 164.5 L202.4 165.4 L200.5 170.8 L199.9 173.3 L199.7 175.0 L199.7 185.5 L199.7 185.5"/><path class="m-line b2" stroke="#FABE00" d="M199.5 187.0 L199.5 188.3 L199.6 197.0 L200.1 200.4 L200.2 201.5 L200.3 205.1 L200.3 208.4 L200.3 214.7 L200.3 216.4 L200.3 221.0 L200.3 222.3 L200.3 223.5 L200.5 225.0 L200.4 226.2 L200.3 227.0 L199.9 228.3 L199.5 229.5 L199.0 230.5 L198.9 231.6 L198.8 233.0 L198.8 234.0 L198.8 236.5 L198.8 238.4 L198.7 239.8 L198.7 241.0 L198.7 241.9 L198.6 243.2 L198.6 246.1 L198.6 247.1 L198.9 249.0 L199.3 251.0 L199.7 253.4 L199.8 255.6 L199.8 256.4 L199.6 257.3 L199.0 258.2 L197.8 259.6 L197.4 260.4 L197.3 263.0 L197.2 264.5 L197.1 271.6 L197.3 277.3 L197.8 279.4 L198.6 281.1 L200.9 283.9 L203.3 286.5 L206.2 289.5 L206.7 290.1 L207.1 291.1 L207.1 292.5 L207.2 294.9 L207.2 297.4 L207.2 299.6 L207.2 301.6 L207.3 308.6 L207.2 312.4 L206.4 314.0 L205.4 315.1 L203.5 315.8 L200.2 316.0 L195.5 316.4 L192.4 316.6 L189.9 316.8 L185.2 317.2 L183.2 317.1 L177.6 315.8 L176.2 315.6 L174.6 315.7 L173.2 316.1 L171.9 317.4 L170.7 319.0 L167.7 323.0 L163.9 328.0 L159.6 333.8 L159.0 334.5 L158.3 335.0 L157.6 335.4 L156.6 335.6 L151.6 335.8 L147.9 335.9 L144.6 336.0 L143.4 335.9 L142.8 335.6 L134.3 328.6 L133.8 327.9 L133.0 326.7 L132.0 324.7 L131.4 324.1 L130.3 323.1 L129.5 322.3 L129.1 321.4 L128.7 319.4 L128.5 318.5 L128.0 317.5 L127.4 316.9 L124.7 315.9 L116.4 313.4 L112.7 312.3 L108.8 311.3 L105.4 310.3 L104.0 309.5 L102.1 308.4 L100.9 308.1 L99.4 307.9 L95.1 309.7 L92.7 310.9 L92.7 310.9"/>
+          <circle cx="120.8" cy="25.4" r="6" fill="#fff" stroke="#D4003B" stroke-width="3"/>
+          <circle cx="199.7" cy="185.5" r="7" fill="#fff" stroke="#14133a" stroke-width="3"/>
+          <circle cx="92.7" cy="310.9" r="6" fill="#fff" stroke="#FABE00" stroke-width="3"/><circle class="gpsr" cx="106.8" cy="41.4" r="5"/><circle cx="106.8" cy="41.4" r="5" fill="#3B82F6" stroke="#fff" stroke-width="2"/><g class="mlab"><rect x="130.8" y="19.4" width="133.8" height="16" rx="4" fill="#fff"/><circle cx="139.8" cy="27.4" r="3.2" fill="#D4003B"/><text x="146.8" y="31.0" font-size="9.5" font-weight="800" fill="#0a0a0a">강남역 승차, 9번 출구</text></g><g class="mlab"><rect x="27.5" y="177.5" width="162.2" height="16" rx="4" fill="#14133a"/><text x="34.5" y="189.1" font-size="9.5" font-weight="800" fill="#fff">정자역 환승, 빠른 환승 5-1</text></g><g class="mlab"><rect x="102.7" y="302.9" width="108.0" height="16" rx="4" fill="#fff"/><circle cx="111.7" cy="310.9" r="3.2" fill="#FABE00"/><text x="118.7" y="314.5" font-size="9.5" font-weight="800" fill="#0a0a0a">수원역 하차, 도착</text></g>
+        </svg>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:12px">
+        <div class="card" data-a><span class="k">카카오 지도 + 실제 선로 모양</span><p>배포 페이지에서는 카카오 지도 위에 노선을 그림. 지하철 21구간은 OpenStreetMap 선로 모양, 버스는 정류장과 도로 경로</p></div>
+        <div class="card" data-a><span class="k">GPS 내 위치</span><p>허용하면 지도에 파란 점. 판정에는 쓰지 않고 위치 확인용</p></div>
+        <div class="card" data-a><span class="k">구간을 누르면 확대</span><p>구간별 연결에서 누른 구간으로 지도가 이동. 예상 이동 경로 보기 중에는 지금 구간을 자동으로 따라감</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 18. 구간별 연결 (빠른 환승 권지원 아이디어) -->
+<section class="slide" data-title="구간별 연결">
+  <p class="eyebrow" data-a>03 기능   구간별 연결</p>
+  <h2 class="t" data-a>환승에서 잃는 1분까지 줄이기</h2>
+  <p data-a style="margin-top:10px"><span class="idea"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 2.5a5 5 0 0 0-3 9v2h6v-2a5 5 0 0 0-3-9zM8 16.5h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>빠른 환승 아이디어 권지원 (개발 담당)</span> <span class="small" style="margin-left:6px">국토교통부 철도역 빠른 환승 정보로 환승 7곳에 칸, 문 번호</span></p>
+  <div class="body">
+    <div class="g73">
+      <div class="card legs" data-a style="padding:10px 18px">
+        <div class="leg walk"><span class="rl"><i></i></span><span><span class="nm2">스타벅스 몬테소리점 → 강남역</span><span class="sb">도보 5분</span><span class="fx">강남역 <b>9번 출구</b>가 가장 가까워요   직선 약 30m</span></span><span class="rt">출발 마감까지<b>3분</b></span></div>
+        <div class="leg" style="--lc:#D4003B"><span class="rl"><i></i></span><span><span class="nm2"><span class="lchip" style="background:#D4003B">신분당선</span>강남 → 정자</span><span class="sb">17분   5개역   노선 막차 00:27</span><span class="cut">노선 막차 00:27보다 69분 이른 23:18에 타야 다음 구간에 이어져요</span><span class="fx">빠른 환승 <b>5-1</b>   5번 칸 1번 문이 갈아타는 곳과 가까워요</span></span><span class="rt">탑승 마감까지<b>8분</b></span></div>
+        <div class="leg walk"><span class="rl"><i></i></span><span><span class="nm2">정자역에서 수인분당선으로 환승</span><span class="sb">도보 3분</span></span><span class="rt">출발 마감까지<b>25분</b></span></div>
+        <div class="leg" style="--lc:#FABE00"><span class="rl"><i></i></span><span><span class="nm2"><span class="lchip" style="background:#FABE00; color:#0a0a0a">수인분당선</span>정자 → 수원</span><span class="sb">39분   15개역   노선 막차 23:38</span></span><span class="rt">탑승 마감까지<b>28분</b></span></div>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:12px">
+        <div class="card" data-a><span class="k">빠른 환승</span><p>타고 오는 열차 방향 기준 칸, 문 번호. 정자 5-1, 대곡 4-2, 창동 3-4, 강남 5-2, 고속터미널 2-3, 사당 5-3. 데이터에 없는 김포골드라인, GTX-A, 신림선 환승은 비워 둠</p></div>
+        <div class="card" data-a><span class="k">가까운 출구</span><p>OpenStreetMap 출구 위치로 출발지에서 가장 가까운 출구. 7개 경로에 표시</p></div>
+        <div class="card" data-a><span class="k">노선 막차 vs 탑승 마감</span><p>노선 자체 막차와, 뒤 구간까지 고려한 실제 탑승 마감을 나눠서 보여 줌</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 19. 개인화와 이동 중 -->
+<section class="slide" data-title="개인화와 이동 중">
+  <p class="eyebrow" data-a>03 기능   개인화와 이동 중</p>
+  <h2 class="t" data-a>내 걸음으로 계산하고, 가는 길에 알려 줌</h2>
+  <div class="body">
+    <div class="g2">
+      <div class="card" data-a><span class="k">걸음 속도 5단계 (스타벅스 몬테소리점 → 수원역, 평일)</span>
+        <div class="tempo" style="margin-top:6px">
+          <div class="trow"><span class="lbl">많이 느림 (깁스, 짐)</span><span class="tbar"><i style="--w:20%"></i></span><span class="tv">23:07</span></div>
+          <div class="trow"><span class="lbl">느림</span><span class="tbar"><i style="--w:45%"></i></span><span class="tv">23:10</span></div>
+          <div class="trow base"><span class="lbl">보통</span><span class="tbar"><i style="--w:70%"></i></span><span class="tv">23:13</span></div>
+          <div class="trow"><span class="lbl">조금 빠름</span><span class="tbar"><i style="--w:78%"></i></span><span class="tv">23:14</span></div>
+          <div class="trow"><span class="lbl">빠름</span><span class="tbar"><i style="--w:86%"></i></span><span class="tv">23:15</span></div>
+        </div>
+        <p class="small" style="margin-top:10px">막대는 최종 출발 마감시각. 같은 경로도 걸음에 따라 최대 8분 차이</p></div>
+      <div style="display:flex; flex-direction:column; gap:12px">
+        <div class="card" data-a><span class="k">예상 이동 경로 보기</span><p>출발 시각과 평균 소요시간으로 지금 어디쯤인지 추정. 내리기 한 역 전에 알림과 진동</p>
+          <div class="toast pop" style="margin-top:10px">다음은 정자역이에요. 내릴 준비하세요<small>정자역에서 수인분당선으로 갈아타요</small></div></div>
+        <div class="card" data-a><span class="k">그 밖에</span><ul><li>마감 10분 전 알림 (화면이 열려 있는 동안)</li><li>현재 위치에서 가까운 출발지 찾기</li><li>귀갓길 공유, 카카오맵과 네이버 지도로 이어 보기</li><li>빨리 감기: 1초에 1분씩 흘러 마감 상황 시연</li></ul></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 20. 믿을 수 있게 -->
+<section class="slide" data-title="근거 공개">
+  <p class="eyebrow" data-a>03 기능   근거 공개</p>
+  <h2 class="t" data-a>왜 이 시각인지 화면에서 바로 확인</h2>
+  <div class="body">
+    <div class="g73">
+      <div class="card" data-a><span class="k">자세히 보기   거꾸로 계산한 과정</span>
+        <table class="tb2" style="margin-top:4px">
+          <tr><th>구간</th><th>소요</th><th>막차</th><th>늦어도 시작</th></tr>
+          <tr><td>도보 → 강남역</td><td>5분</td><td></td><td><b>23:13</b></td></tr>
+          <tr><td>신분당선 강남 → 정자</td><td>17분</td><td>00:27</td><td><b>23:18</b></td></tr>
+          <tr><td>환승 도보</td><td>3분</td><td></td><td><b>23:35</b></td></tr>
+          <tr><td>수인분당선 정자 → 수원</td><td>39분</td><td>23:38</td><td><b class="hl">23:38</b></td></tr>
+        </table></div>
+      <div style="display:flex; flex-direction:column; gap:12px">
+        <div class="card" data-a><span class="k">한 줄 근거</span><p>판정 바로 아래 "오늘 마감은 수인분당선 정자역 막차 23:38 기준이에요"</p></div>
+        <div class="card" data-a><span class="k">불확실성 표시</span><p>버스가 마감을 정하면 "버스 시간표 기준", 토요일 시간표가 없으면 "일요일 시간표 기준"</p></div>
+        <div class="card" data-a><span class="k">개발자 모드</span><p>마감을 정하는 구간, 데이터 출처, 수집 날짜를 별도 화면에 모아 둠</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 21. 한계와 다음 단계 -->
+<section class="slide nexts" data-title="다음 단계">
+  <p class="eyebrow" data-a>04 마무리   한계와 다음 단계</p>
+  <h2 class="t" data-a>중간 산출물 이후 기말까지</h2>
+  <div class="body">
+    <div class="g3">
+      <div class="card" data-a><span class="k">한계 1</span><p class="now">조사된 11개 경로 안에서만 판정</p><p class="to">실제 검색</p><p>카카오 대중교통 경로 조회 API(하루 1,000건 무료)로 아무 출발지, 도착지. 키를 숨기는 중간 서버 필요</p></div>
+      <div class="card" data-a><span class="k">한계 2</span><p class="now">버스는 시간표 기준이라 실제와 차이</p><p class="to">실제 막차 기록</p><p>매일 밤 버스 도착 정보를 자동으로 수집해 최근 3 ~ 5일 실제 막차 시간대 표시</p></div>
+      <div class="card" data-a><span class="k">한계 3</span><p class="now">처음 쓰는 사람을 위한 안내 없음</p><p class="to">첫 실행 안내</p><p>처음 열 때 사용법 팝업. 사용자 테스트에서 헷갈린 지점 위주로</p></div>
+    </div>
+    <div class="card" data-a><span class="k">유지 원칙</span><p>무료 도구만 사용, 확인된 값만 표시, 모르면 판정 보류. 실제 검색이 붙어도 같은 역산 엔진과 같은 화면을 그대로 사용</p></div>
+  </div>
+</section>
+
+<!-- 22. 직접 써보기 -->
+<section class="slide" data-title="직접 써보기">
+  <p class="eyebrow" data-a>04 마무리   직접 써보기</p>
+  <h2 class="t" data-a>데모를 직접 눌러 보세요</h2>
+  <div class="body">
+    <div class="g73" style="align-items:center">
+      <div>
+        <a class="cta" href="https://rnjswldnjs.github.io/lastrain/" target="_blank" rel="noopener">라스트레인 데모 열기<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        <p class="url">rnjswldnjs.github.io/lastrain</p>
+        <div class="dev"><span class="tag">모바일 가능</span><span class="tag">PC 가능</span><span class="tag gray">설치 필요 없음</span><span class="tag gray">크롬, 사파리</span></div>
+        <ol class="steps" style="margin-top:22px">
+          <li><span>도착지에 <b>수원</b>을 입력하면 출발지 <b>스타벅스 몬테소리점</b>이 자동으로 채워짐</span></li>
+          <li><span>출발을 <b>평일 23:10</b>으로 바꾸고 <b>막차 확인</b></span></li>
+          <li><span>지도에서 구간을 눌러 보고, 상단 <b>빨리 감기</b>로 마감 직전 상황 확인</span></li>
+        </ol>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:12px">
+        <div class="qr" data-a><svg viewBox="0 0 33 33" role="img" aria-label="데모 주소 QR 코드" xmlns="http://www.w3.org/2000/svg" class="segno"><path fill="#fff" d="M0 0h33v33h-33z"/><path class="qrline" stroke="#14133a" d="M2 2.5h7m3 0h1m3 0h1m3 0h1m3 0h7m-29 1h1m5 0h1m1 0h3m1 0h3m1 0h1m1 0h1m3 0h1m5 0h1m-29 1h1m1 0h3m1 0h1m1 0h1m1 0h1m4 0h1m2 0h1m1 0h1m1 0h1m1 0h3m1 0h1m-29 1h1m1 0h3m1 0h1m1 0h2m3 0h5m4 0h1m1 0h3m1 0h1m-29 1h1m1 0h3m1 0h1m3 0h1m1 0h2m2 0h1m2 0h2m1 0h1m1 0h3m1 0h1m-29 1h1m5 0h1m2 0h1m3 0h2m1 0h1m3 0h1m1 0h1m5 0h1m-29 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-21 1h1m2 0h2m1 0h1m-15 1h1m5 0h1m1 0h2m1 0h1m3 0h1m1 0h1m1 0h1m1 0h2m2 0h3m-28 1h1m1 0h2m3 0h1m1 0h1m4 0h2m2 0h2m1 0h1m1 0h2m1 0h2m-28 1h1m4 0h3m2 0h3m2 0h1m1 0h2m1 0h1m2 0h1m-24 1h2m8 0h1m1 0h1m2 0h1m2 0h5m1 0h2m-24 1h1m3 0h1m1 0h2m1 0h5m2 0h3m1 0h1m5 0h1m-29 1h1m1 0h1m1 0h1m5 0h1m2 0h1m1 0h6m1 0h3m2 0h2m-29 1h4m1 0h2m1 0h1m1 0h6m1 0h1m4 0h1m2 0h2m-26 1h2m2 0h1m6 0h3m3 0h2m2 0h1m3 0h1m1 0h1m-29 1h1m2 0h1m2 0h1m1 0h1m1 0h1m1 0h1m1 0h4m1 0h1m5 0h2m-27 1h5m4 0h1m1 0h1m3 0h5m2 0h3m1 0h3m-29 1h2m1 0h1m2 0h1m1 0h4m1 0h3m1 0h3m2 0h2m1 0h1m2 0h1m-29 1h1m1 0h2m1 0h1m1 0h2m1 0h1m1 0h1m1 0h2m3 0h1m3 0h1m-24 1h1m2 0h2m1 0h2m4 0h1m2 0h3m2 0h5m1 0h3m-21 1h6m1 0h1m1 0h4m3 0h2m-26 1h7m3 0h2m1 0h5m1 0h2m1 0h1m1 0h3m-27 1h1m5 0h1m3 0h4m5 0h2m3 0h1m3 0h1m-29 1h1m1 0h3m1 0h1m4 0h1m1 0h1m1 0h2m1 0h8m2 0h1m-29 1h1m1 0h3m1 0h1m2 0h2m1 0h2m1 0h4m1 0h2m3 0h2m1 0h1m-29 1h1m1 0h3m1 0h1m6 0h1m1 0h1m1 0h1m2 0h8m-28 1h1m5 0h1m2 0h5m7 0h1m3 0h2m1 0h1m-29 1h7m1 0h2m1 0h1m5 0h1m1 0h1m1 0h2m1 0h3"/></svg></div>
+        <p class="small" data-a>휴대폰 카메라로 바로 열기</p>
+      </div>
+    </div>
+  </div>
+  <p class="foot">노선 모양, 좌표, 출구 © OpenStreetMap 기여자   막차 서울 열린데이터광장, 국토교통부 TAGO, 서울, 경기 버스 정보   빠른 환승 국토교통부</p>
+</section>
+
+</main>
+
+<nav class="nav" aria-label="슬라이드 이동">
+  <button class="nb" id="prev" type="button" aria-label="이전 슬라이드"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M12.5 4.5L7 10l5.5 5.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  <div class="dots" id="dots"></div>
+  <span class="cnt" id="cnt" aria-live="polite"></span>
+  <button class="nb" id="next" type="button" aria-label="다음 슬라이드"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.5 4.5L13 10l-5.5 5.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+</nav>
+
+<script>
+(function(){
+  var stage=document.getElementById("stage"), slides=[].slice.call(stage.querySelectorAll(".slide")), cur=0;
+  var dots=document.getElementById("dots"), cnt=document.getElementById("cnt");
+  slides.forEach(function(s,i){
+    [].slice.call(s.querySelectorAll("[data-a]")).forEach(function(el,j){ el.style.setProperty("--i", j); });
+    var d=document.createElement("button"); d.className="dot"; d.type="button"; d.setAttribute("aria-label",(i+1)+"번 슬라이드, "+s.dataset.title);
+    d.onclick=function(){ go(i); }; dots.appendChild(d);
+  });
+  function fit(){
+    var w=innerWidth, h=innerHeight, flow = w<760 && h>w;
+    document.documentElement.classList.toggle("flow", flow);
+    if(!flow){ var s=Math.min(w/1280, (h-8)/720); stage.style.transform="translate(-50%,-50%) scale("+s+")"; }
+  }
+  function countUp(s){
+    [].slice.call(s.querySelectorAll("[data-count]")).forEach(function(el){
+      var to=+el.dataset.count, t0=null;
+      function step(t){ if(!t0) t0=t; var p=Math.min(1,(t-t0)/900); el.textContent=Math.round(to*(1-Math.pow(1-p,3))); if(p<1) requestAnimationFrame(step); }
+      requestAnimationFrame(step);
+    });
+  }
+  var hotT=null;
+  function hot(on){
+    clearInterval(hotT); var card=document.getElementById("hotCard"), v=document.getElementById("hotV"); if(!card) return;
+    var rem=599;
+    function paint(){ var m=Math.floor(rem/60), ss=rem%60; v.innerHTML=m+"<small>분</small>"+(ss<10?"0":"")+ss+"<small>초</small>";
+      card.style.setProperty("--heat", Math.min(1, Math.max(0, 1-rem/600)).toFixed(3)); }
+    paint(); if(on) hotT=setInterval(function(){ rem = rem>0 ? rem-7 : 599; if(rem<0) rem=0; paint(); }, 120);
+  }
+  function go(i){
+    i=Math.max(0,Math.min(slides.length-1,i)); if(i===cur && slides[i].classList.contains("on")) return;
+    slides[cur].classList.remove("on"); cur=i; var s=slides[cur];
+    void s.offsetWidth; s.classList.add("on"); s.scrollTop=0;
+    [].slice.call(dots.children).forEach(function(d,j){ d.classList.toggle("on", j===cur); d.setAttribute("aria-current", j===cur?"true":"false"); });
+    cnt.textContent=(cur+1)+" / "+slides.length;
+    try{ history.replaceState(null,"","#"+(cur+1)); }catch(e){}
+    countUp(s); hot(s.querySelector("#hotCard")!=null);
+  }
+  document.getElementById("prev").onclick=function(){ go(cur-1); };
+  document.getElementById("next").onclick=function(){ go(cur+1); };
+  addEventListener("keydown", function(e){
+    if(["ArrowRight","PageDown"," ","Enter"].indexOf(e.key)>=0 && !(e.target.closest && e.target.closest("a,button"))){ e.preventDefault(); go(cur+1); }
+    else if(e.key==="ArrowRight"){ go(cur+1); }
+    else if(e.key==="ArrowLeft"||e.key==="PageUp"){ e.preventDefault(); go(cur-1); }
+    else if(e.key==="Home"){ go(0); } else if(e.key==="End"){ go(slides.length-1); }
+  });
+  var tx=null, ty=null;
+  addEventListener("touchstart", function(e){ tx=e.touches[0].clientX; ty=e.touches[0].clientY; }, {passive:true});
+  addEventListener("touchend", function(e){ if(tx==null) return; var dx=e.changedTouches[0].clientX-tx, dy=e.changedTouches[0].clientY-ty;
+    if(Math.abs(dx)>60 && Math.abs(dx)>Math.abs(dy)*1.5) go(cur+(dx<0?1:-1)); tx=null; }, {passive:true});
+  var SUN='<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="3.6" stroke="currentColor" stroke-width="1.7"/><path d="M10 2.5v1.8M10 15.7v1.8M2.5 10h1.8M15.7 10h1.8M4.7 4.7l1.3 1.3M14 14l1.3 1.3M4.7 15.3L6 14M14 6l1.3-1.3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>', MOON='<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M16.5 12.3A6.8 6.8 0 0 1 7.7 3.5a6.8 6.8 0 1 0 8.8 8.8z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>', tb=document.getElementById("themeBtn");
+  function theme(t){ document.documentElement.dataset.theme=t; try{ localStorage.setItem("lt-deck:theme", t); }catch(e){}
+    tb.innerHTML=(t==="dark"?SUN+"밝게":MOON+"어둡게"); tb.setAttribute("aria-label", t==="dark"?"밝은 화면으로":"어두운 화면으로");
+    var m=document.querySelector('meta[name="theme-color"]'); if(m) m.content = t==="dark" ? "#15143a" : "#f7f7f5"; }
+  tb.onclick=function(){ theme(document.documentElement.dataset.theme==="dark"?"light":"dark"); };
+  theme(document.documentElement.dataset.theme==="light"?"light":"dark");
+  addEventListener("resize", fit); fit();
+  var h=parseInt((location.hash||"").slice(1),10); slides[0].classList.remove("on"); cur = (h>=1 && h<=slides.length) ? h-1 : 0;
+  slides[cur].classList.add("on"); go(cur); if(!slides[cur].classList.contains("on")) slides[cur].classList.add("on");
+  [].slice.call(dots.children).forEach(function(d,j){ d.classList.toggle("on", j===cur); }); cnt.textContent=(cur+1)+" / "+slides.length; countUp(slides[cur]); hot(slides[cur].querySelector("#hotCard")!=null);
+})();
+</script>
+</body>
+</html>
